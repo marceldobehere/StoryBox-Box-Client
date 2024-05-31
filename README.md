@@ -1,2 +1,2 @@
-# StoryBox---Box-Client
+# StoryBox-Box-Client
 Box Client for StoryBox
