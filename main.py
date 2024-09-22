@@ -3,21 +3,43 @@
 import RPi.GPIO as GPIO
 from mfrc522 import SimpleMFRC522
 from time import sleep
-
 import vlc
 
+
+# 0 - RED, 1 - YELLOW
+buttons = [3, 5]
+def initButtons():
+    GPIO.setwarnings(False) # Ignore warning for now
+    GPIO.setmode(GPIO.BOARD) # Use physical pin numbering
+    for id in buttons:
+        GPIO.setup(id, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+
+def getBtn(idx):
+    return GPIO.input(buttons[idx]) == 0
+
+initButtons()
 
 
 def mainLoop():
     reader = SimpleMFRC522()
     print('Ready')
 
+
     exit = False
     while not exit:
         try:
             print('> Waiting for Chip:')
-            id, text = reader.read()
-            tryPlaySound(id)
+
+            id, text = reader.read_no_block()
+            if id:
+                tryPlaySound(id)
+                continue
+            
+            if getBtn(1):
+                tryPlaySound(12345)
+                continue
+                
+            sleep(0.1)
         finally:
             pass
     GPIO.cleanup()
@@ -31,6 +53,8 @@ def getFileFromId(id):
         return "nokia klingel.wav"
     if id == 12345:
         return "draw.mp3"
+    if id == 874127460810:
+        return "t.mp3"
     return ""
 
 def tryPlaySound(id):
@@ -53,7 +77,10 @@ def tryPlaySound(id):
     while True:
         if player.get_state() == Ended:
             break
-        sleep(0.5)
+        if getBtn(0):
+            print('  > Force Stop')
+            break
+        sleep(0.1)
 
     print('  > Stop')
     player.stop()
@@ -61,32 +88,7 @@ def tryPlaySound(id):
 
 
 tryPlaySound(12345)
-
 mainLoop()
-
-
-# print('Music')
-# player = vlc.MediaPlayer("bruh.wav")
-# player.audio_set_volume(200)
-
-# print('Play')
-# player.play()
-# sleep(1)
-
-# print('Pause')
-# player.pause()
-# sleep(1)
-
-# print('Play')
-# player.play()
-# sleep(1)
-
-# print('Stop-')
-# player.stop()
-
-# print('Hello')
-
-# exit()
 
 
 

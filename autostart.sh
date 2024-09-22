@@ -6,8 +6,8 @@ pwd
 
 echo "> Doing Autostart"
 
-echo "> Waiting 5s"
-sleep 5s
+echo "> Waiting 2s"
+sleep 2s
 
 echo "> Starting Program"
 sudo -H -u marcel bash ./start.sh
