@@ -29,6 +29,8 @@ def getFileFromId(id):
         return "scream.mp3"
     if id == 338358677895:
         return "nokia klingel.wav"
+    if id == 12345:
+        return "draw.mp3"
     return ""
 
 def tryPlaySound(id):
@@ -56,6 +58,9 @@ def tryPlaySound(id):
     print('  > Stop')
     player.stop()
 
+
+
+tryPlaySound(12345)
 
 mainLoop()
 
