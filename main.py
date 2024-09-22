@@ -4,7 +4,9 @@ import RPi.GPIO as GPIO
 from mfrc522 import SimpleMFRC522
 from time import sleep
 import vlc
-
+import os
+import os.path
+import json
 
 # 0 - RED, 1 - YELLOW
 buttons = [3, 5]
@@ -18,6 +20,58 @@ def getBtn(idx):
     return GPIO.input(buttons[idx]) == 0
 
 initButtons()
+
+
+def readFile(path):
+    f = open(path, "r")
+    return f.read()
+
+def writeFile(path, text):
+    f = open(path, "w")
+    f.write(text)
+    f.close()
+
+def readFileOrDef(path, defaultText):
+    if not os.path.isfile(path):
+        writeFile(path, defaultText)
+    return readFile(path)
+
+serialCode = ""
+accountCode = ""
+playlist = {}
+testPlayList = {
+    "12345": "draw.mp3",
+    "874127460810": "t.mp3",
+    "338358677895": "nokia klingel.wav",
+    "682123768128": "scream.mp3",
+    "528310846334": "bruh.wav"
+}
+
+def initData():
+    global serialCode, accountCode, playlist
+
+    serialCode = readFileOrDef("./data/serial_code.txt", "SERIAL-12345-TEST")
+    print("> Serial Code: " + serialCode)
+
+    accountCode = readFileOrDef("./data/account_code.txt", "ACCOUNT-BRUH_12345-TEST")
+    print("> Account Code: " + accountCode)
+
+    playlistStr = readFileOrDef("./data/song_map.json", json.dumps(testPlayList, indent=4))
+    playlist = json.loads(playlistStr)
+    print("> Playlist: " + json.dumps(playlist))
+
+
+try:
+    initData()
+except Exception as error:
+    print("ERROR DURING INIT: " + str(error))
+    exit(-1)
+
+
+
+
+
+
 
 
 def mainLoop():
@@ -45,17 +99,12 @@ def mainLoop():
     GPIO.cleanup()
 
 def getFileFromId(id):
-    if id == 528310846334:
-        return "bruh.wav"
-    if id == 682123768128:
-        return "scream.mp3"
-    if id == 338358677895:
-        return "nokia klingel.wav"
-    if id == 12345:
-        return "draw.mp3"
-    if id == 874127460810:
-        return "t.mp3"
-    return ""
+    res = playlist.get(str(id))
+    print('"' + str(id) + '" -> ' + str(res) + " " + str(playlist))
+    if res == None:
+        return ""
+    else:
+        return res
 
 def tryPlaySound(id):
     print(' > Attempting to play from ID: ' + str(id))
