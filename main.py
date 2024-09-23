@@ -44,7 +44,8 @@ testPlayList = {
     "874127460810": "t.mp3",
     "338358677895": "nokia klingel.wav",
     "682123768128": "scream.mp3",
-    "528310846334": "bruh.wav"
+    "528310846334": "bruh.wav",
+    "541262328181": "fart-2.wav"
 }
 
 def initData():
