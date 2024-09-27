@@ -4,3 +4,4 @@ python -m venv ~/story-box/env
 ./install.sh RPi.GPIO 
 ./install.sh spidev 
 ./install.sh python-vlc 
+./install.sh requests

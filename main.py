@@ -3,66 +3,23 @@
 import RPi.GPIO as GPIO
 from mfrc522 import SimpleMFRC522
 from time import sleep
-import vlc
-import os
-import os.path
-import json
-
-# 0 - RED, 1 - YELLOW
-buttons = [3, 5]
-def initButtons():
-    GPIO.setwarnings(False) # Ignore warning for now
-    GPIO.setmode(GPIO.BOARD) # Use physical pin numbering
-    for id in buttons:
-        GPIO.setup(id, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-
-def getBtn(idx):
-    return GPIO.input(buttons[idx]) == 0
-
-initButtons()
 
 
-def readFile(path):
-    f = open(path, "r")
-    return f.read()
+import src.files as files
+import src.audio as audio
+import src.btn as btn
+import src.boxData as boxData
+import src.network as network
+import src.syncStuff as syncStuff
 
-def writeFile(path, text):
-    f = open(path, "w")
-    f.write(text)
-    f.close()
-
-def readFileOrDef(path, defaultText):
-    if not os.path.isfile(path):
-        writeFile(path, defaultText)
-    return readFile(path)
-
-serialCode = ""
-accountCode = ""
-playlist = {}
-testPlayList = {
-    "12345": "draw.mp3",
-    "874127460810": "t.mp3",
-    "338358677895": "nokia klingel.wav",
-    "682123768128": "scream.mp3",
-    "528310846334": "bruh.wav",
-    "541262328181": "fart-2.wav"
-}
 
 def initData():
-    global serialCode, accountCode, playlist
-
-    serialCode = readFileOrDef("./data/serial_code.txt", "SERIAL-12345-TEST")
-    print("> Serial Code: " + serialCode)
-
-    accountCode = readFileOrDef("./data/account_code.txt", "ACCOUNT-BRUH_12345-TEST")
-    print("> Account Code: " + accountCode)
-
-    playlistStr = readFileOrDef("./data/song_map.json", json.dumps(testPlayList, indent=4))
-    playlist = json.loads(playlistStr)
-    print("> Playlist: " + json.dumps(playlist))
+    boxData.initBoxData()
+    audio.initPlaylistData()
 
 
 try:
+    btn.initButtons()
     initData()
 except Exception as error:
     print("ERROR DURING INIT: " + str(error))
@@ -70,15 +27,9 @@ except Exception as error:
 
 
 
-
-
-
-
-
 def mainLoop():
     reader = SimpleMFRC522()
     print('Ready')
-
 
     exit = False
     while not exit:
@@ -87,57 +38,23 @@ def mainLoop():
 
             id, text = reader.read_no_block()
             if id:
-                tryPlaySound(id)
+                audio.tryPlaySound(id)
                 continue
             
-            if getBtn(1):
-                tryPlaySound(12345)
+            if btn.getBtn(1):
+                audio.tryPlaySound(12345)
                 continue
                 
-            sleep(0.1)
+            sleep(0.14)
         finally:
             pass
     GPIO.cleanup()
 
-def getFileFromId(id):
-    res = playlist.get(str(id))
-    print('"' + str(id) + '" -> ' + str(res) + " " + str(playlist))
-    if res == None:
-        return ""
-    else:
-        return res
 
-def tryPlaySound(id):
-    print(' > Attempting to play from ID: ' + str(id))
-    filename = getFileFromId(id)
-    if filename == "":
-        print(' > Unkown ID!')
-        sleep(1)
-        return
-    print(" > Playing: " + filename)
+# print("File Test: " + str(network.getTestFile(2)))
 
-    player = vlc.MediaPlayer("./test_audio/"+filename)
-    player.audio_set_volume(100)
-    
-    print('  > Play')
-    player.play()
-    
-    print('  > Wait')
-    Ended = 6
-    while True:
-        if player.get_state() == Ended:
-            break
-        if getBtn(0):
-            print('  > Force Stop')
-            break
-        sleep(0.1)
-
-    print('  > Stop')
-    player.stop()
-
-
-
-tryPlaySound(12345)
+syncStuff.do_something()
+audio.tryPlaySound(12345)
 mainLoop()
 
 
