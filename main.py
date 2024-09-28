@@ -30,18 +30,19 @@ def mainLoop():
     exit = False
     while not exit:
         try:
-            print('> Waiting for Chip:')
+            # print('> Waiting for Chip:')
 
             id, text = reader.read_no_block()
             if id:
                 audio.tryPlayPlaylist(id)
+                sleep(0.5)
                 continue
             
             if btn.getBtn(1):
-                audio.tryPlaySound(12345)
+                audio.tryPlayFile("./OLD/draw.mp3")
                 continue
                 
-            sleep(0.14)
+            sleep(0.1)
         finally:
             pass
     GPIO.cleanup()
@@ -50,10 +51,7 @@ def mainLoop():
 # print("File Test: " + str(network.getTestFile(2)))
 
 syncStuff.performSync()
-exit(0)
-
-syncStuff.do_something()
-audio.tryPlaySound(12345)
+audio.tryPlayFile("./OLD/draw.mp3")
 mainLoop()
 
 

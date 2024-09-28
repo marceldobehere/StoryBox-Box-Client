@@ -62,17 +62,18 @@ def performSync():
     for file in needToDelete:
         try:
             print("  > Deleting File: ", file)
-            files.removeFile("./audios/DOWNLOAD_"+str(file)+".mp3")
+            files.removeFile(audio.getFileNameFromId(file, True))
         except Exception as error:
             print("  > Error during deletion: ", error)
 
+    print(" > Sync complete")
 
 
 
-
-# does a ping every 10 minutes
+# does a ping + sync every 10 minutes
 def my_function():
     network.doPing()
+    performSync()
 
 def run_function():
     thread = threading.Timer(10 * 60.0, run_function)

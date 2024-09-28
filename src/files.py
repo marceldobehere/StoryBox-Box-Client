@@ -10,6 +10,9 @@ def writeFile(path, text):
     f.write(text)
     f.close()
 
+def fileExists(path):
+    return os.path.isfile(path)
+
 def readFileOrDef(path, defaultText):
     if not os.path.isfile(path):
         writeFile(path, defaultText)

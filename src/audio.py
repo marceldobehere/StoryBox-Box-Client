@@ -4,6 +4,8 @@ import src.files as files
 import os.path
 import json
 import src.btn as btn
+import random
+secure_random = random.SystemRandom()
 
 # playlist = {}
 # testPlayList = {
@@ -39,7 +41,11 @@ testPlaylistMap = [
     },
 ]
 
-
+def getFileNameFromId(id, getFullPath):
+    filename = "DOWNLOAD_" + str(id) + ".mp3"
+    if getFullPath:
+        return "./audios/" + filename
+    return filename
 
 def getDownloadedFiles():
     downloaded = files.getFilesInFolder("audios")
@@ -60,13 +66,50 @@ def getAllFilesNeeded():
 
 
 def tryPlayFile(path):
-    pass
+    if path == "" or not files.fileExists(path):
+        print(' > Unkown Path! ', path)
+        sleep(1)
+        return
+    print(" > Playing: " + path)
 
-def getFilenameFromPlaylist(playlist_id):
-    pass
+    player = vlc.MediaPlayer(path)
+    player.audio_set_volume(100)
+    
+    print('  > Play')
+    player.play()
+    
+    print('  > Wait')
+    Ended = 6
+    while True:
+        if player.get_state() == Ended:
+            break
+        if btn.getBtn(0):
+            print('  > Force Stop')
+            break
+        sleep(0.1)
+
+    print('  > Stop')
+    player.stop()
+
+def findPlaylist(playlist_id):
+    for playlist in playlistMap:
+        if str(playlist["id"]) == str(playlist_id):
+            return playlist
 
 def tryPlayPlaylist(id):
-    pass
+    print(' > Attempting to play random song from Playlist with ID: ' + str(id))
+    playlist = findPlaylist(str(id))
+    if playlist is None:
+        print(" > Playlist not found!")
+        sleep(0.5)
+        return
+    print(playlist)
+    audioFiles = playlist["audioFiles"]
+    audioFile = secure_random.choice(audioFiles)
+    audioFile = getFileNameFromId(audioFile, True)
+    print(" > Picked: ", audioFile)
+    tryPlayFile(audioFile)
+
 
 def initPlaylistData():
     global playlistMap
@@ -104,31 +147,3 @@ def getFileFromId(id):
         return ""
     else:
         return res
-
-def tryPlaySound(id):
-    print(' > Attempting to play from ID: ' + str(id))
-    filename = getFileFromId(id)
-    if filename == "":
-        print(' > Unkown ID!')
-        sleep(1)
-        return
-    print(" > Playing: " + filename)
-
-    player = vlc.MediaPlayer("./test_audio/"+filename)
-    player.audio_set_volume(100)
-    
-    print('  > Play')
-    player.play()
-    
-    print('  > Wait')
-    Ended = 6
-    while True:
-        if player.get_state() == Ended:
-            break
-        if btn.getBtn(0):
-            print('  > Force Stop')
-            break
-        sleep(0.1)
-
-    print('  > Stop')
-    player.stop()

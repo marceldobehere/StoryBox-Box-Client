@@ -1,5 +1,6 @@
 import requests
 import src.boxData as boxData
+import src.audio as audio
 
 box_server_url = "https://storybox-server-box-157863384612.us-central1.run.app"
 
@@ -12,7 +13,8 @@ def getTestFile(audio_id):
         return False
     # print(response.content)
 
-    filename = "./audios/DOWNLOAD_"+str(audio_id)+".mp3"
+    filename = audio.getFileNameFromId(audio_id, True)
+    # filename = "./audios/DOWNLOAD_"+str(audio_id)+".mp3"
     with open(filename, "wb") as binary_file:
         binary_file.write(response.content)
 
