@@ -76,9 +76,9 @@ def my_function():
     performSync()
 
 def run_function():
-    thread = threading.Timer(10 * 60.0, run_function)
+    thread = threading.Timer(60 * 10.0, run_function)
     thread.start()
     my_function()
 
-def do_something():
+def startSyncLoop():
     run_function() # start the timer

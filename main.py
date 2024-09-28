@@ -51,6 +51,7 @@ def mainLoop():
 # print("File Test: " + str(network.getTestFile(2)))
 
 syncStuff.performSync()
+syncStuff.startSyncLoop()
 audio.tryPlayFile("./OLD/draw.mp3")
 mainLoop()
 
