@@ -13,14 +13,10 @@ import src.network as network
 import src.syncStuff as syncStuff
 
 
-def initData():
-    boxData.initBoxData()
-    audio.initPlaylistData()
-
-
 try:
     btn.initButtons()
-    initData()
+    boxData.initBoxData()
+    audio.initPlaylistData()
 except Exception as error:
     print("ERROR DURING INIT: " + str(error))
     exit(-1)
@@ -38,7 +34,7 @@ def mainLoop():
 
             id, text = reader.read_no_block()
             if id:
-                audio.tryPlaySound(id)
+                audio.tryPlayPlaylist(id)
                 continue
             
             if btn.getBtn(1):
@@ -52,6 +48,9 @@ def mainLoop():
 
 
 # print("File Test: " + str(network.getTestFile(2)))
+
+syncStuff.performSync()
+exit(0)
 
 syncStuff.do_something()
 audio.tryPlaySound(12345)
