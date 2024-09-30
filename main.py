@@ -12,6 +12,12 @@ import src.boxData as boxData
 import src.network as network
 import src.syncStuff as syncStuff
 
+LOW_POWER_MODE = False
+def setLowPowerMode(state):
+    global LOW_POWER_MODE
+    LOW_POWER_MODE = True
+    print("> Set Low Power Mode To: ", LOW_POWER_MODE)
+
 
 try:
     btn.initButtons()
@@ -20,7 +26,7 @@ try:
 except Exception as error:
     print("ERROR DURING INIT: " + str(error))
     exit(-1)
-
+setLowPowerMode(True)
 
 
 def mainLoop():
@@ -41,8 +47,11 @@ def mainLoop():
             if btn.getBtn(1):
                 audio.tryPlayFile("./OLD/draw.mp3")
                 continue
-                
-            sleep(0.1)
+            
+            if LOW_POWER_MODE:
+                sleep(1.4)
+            else:
+                sleep(0.1)
         finally:
             pass
     GPIO.cleanup()
