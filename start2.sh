@@ -4,5 +4,5 @@ pwd
 ls
 # pulseaudio -D
 
-source ~/story-box/env/bin/activate
+source /home/marcel/story-box/env/bin/activate
 python3 main.py

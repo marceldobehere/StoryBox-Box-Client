@@ -3,7 +3,7 @@
 import RPi.GPIO as GPIO
 from mfrc522 import SimpleMFRC522
 from time import sleep
-
+from subprocess import call
 
 import src.files as files
 import src.audio as audio
@@ -28,6 +28,9 @@ except Exception as error:
     exit(-1)
 setLowPowerMode(True)
 
+def powerOff():
+    print("> Shutting off")
+    print(" > Result: ", call("sudo nohup shutdown -h now", shell=True))
 
 def mainLoop():
     reader = SimpleMFRC522()
@@ -48,8 +51,12 @@ def mainLoop():
                 audio.tryPlayFile("./OLD/draw.mp3")
                 continue
             
+            if not btn.getBtn(2):
+                powerOff()
+                continue
+            
             if LOW_POWER_MODE:
-                sleep(1.4)
+                sleep(1.1)
             else:
                 sleep(0.1)
         finally:
@@ -60,7 +67,7 @@ def mainLoop():
 # print("File Test: " + str(network.getTestFile(2)))
 
 # syncStuff.performSync()
-syncStuff.startSyncLoop()
+#syncStuff.startSyncLoop()
 audio.tryPlayFile("./OLD/draw.mp3")
 mainLoop()
 

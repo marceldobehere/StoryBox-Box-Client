@@ -1,7 +1,7 @@
 import RPi.GPIO as GPIO
 
-# 0 - RED, 1 - YELLOW
-buttons = [3, 5]
+# 0 - RED, 1 - YELLOW, 2 - POWEROFF
+buttons = [3, 5, 7]
 def initButtons():
     GPIO.setwarnings(False) # Ignore warning for now
     GPIO.setmode(GPIO.BOARD) # Use physical pin numbering
