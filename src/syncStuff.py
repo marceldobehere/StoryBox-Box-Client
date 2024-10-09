@@ -26,48 +26,50 @@ def updatePlaylist():
         print("  > Error during download: ", error) 
 
 def performSync():
-    print("> Performing Sync")
+    try:
+        print("> Performing Sync")
 
-    updatePlaylist()
+        updatePlaylist()
 
-    downloaded = audio.getDownloadedFiles()
-    needed = audio.getAllFilesNeeded()
+        downloaded = audio.getDownloadedFiles()
+        needed = audio.getAllFilesNeeded()
 
-    print(" > Downloaded: ", downloaded)
-    print(" > Needed: ", needed)
+        print(" > Downloaded: ", downloaded)
+        print(" > Needed: ", needed)
 
-    needToDownload = []
-    for file in needed:
-        if not file in downloaded:
-            needToDownload.append(file)
+        needToDownload = []
+        for file in needed:
+            if not file in downloaded:
+                needToDownload.append(file)
 
-    needToDelete = []
-    for file in downloaded:
-        if not file in needed:
-            needToDelete.append(file)
+        needToDelete = []
+        for file in downloaded:
+            if not file in needed:
+                needToDelete.append(file)
 
-    print(" > Need to Download:", needToDownload)
-    print(" > Need to Delete: ", needToDelete)
+        print(" > Need to Download:", needToDownload)
+        print(" > Need to Delete: ", needToDelete)
 
-    print(" > Downloading new Files")
-    for file in needToDownload:
-        try:
-            print("  > Downloading File: ", file)
-            if network.getTestFile(file) is None:
-                print("  > Failed to download ")
-        except Exception as error:
-            print("  > Error during download: ", error)
+        print(" > Downloading new Files")
+        for file in needToDownload:
+            try:
+                print("  > Downloading File: ", file)
+                if network.getTestFile(file) is None:
+                    print("  > Failed to download ")
+            except Exception as error:
+                print("  > Error during download: ", error)
 
-    print(" > Deleting old Files")
-    for file in needToDelete:
-        try:
-            print("  > Deleting File: ", file)
-            files.removeFile(audio.getFileNameFromId(file, True))
-        except Exception as error:
-            print("  > Error during deletion: ", error)
+        print(" > Deleting old Files")
+        for file in needToDelete:
+            try:
+                print("  > Deleting File: ", file)
+                files.removeFile(audio.getFileNameFromId(file, True))
+            except Exception as error:
+                print("  > Error during deletion: ", error)
 
-    print(" > Sync complete")
-
+        print(" > Sync complete")
+    except Exception as error:
+        print("  > Error during sync: ", error) 
 
 
 # does a ping + sync every 10 minutes
