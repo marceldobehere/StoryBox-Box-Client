@@ -3,6 +3,7 @@ import src.network as network
 import src.audio as audio
 import src.network as network
 import src.files as files
+from time import sleep
 import json
 
 def updatePlaylist():
@@ -74,12 +75,16 @@ def performSync():
 
 # does a ping + sync every 10 minutes
 def my_function():
-    network.doPing()
-    performSync()
+    try:
+        network.doPing()
+        performSync()
+    except Exception as error:
+        print("  > Error during sync: ", error) 
 
 def run_function():
     thread = threading.Timer(60 * 10.0, run_function)
     thread.start()
+    sleep(5)
     my_function()
 
 def startSyncLoop():

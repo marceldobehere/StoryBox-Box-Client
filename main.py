@@ -84,8 +84,8 @@ syncStuff.startSyncLoop()
 
 timestamp.printTimeLog("Main loop")
 mainLoop()
-
-
+timestamp.printTimeLog("Exit")
+exit(0)
 
 # try:
 #     id, text = reader.read()
