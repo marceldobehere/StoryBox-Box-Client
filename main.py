@@ -12,8 +12,9 @@ import src.boxData as boxData
 import src.network as network
 import src.syncStuff as syncStuff
 import src.timestamp as timestamp
+from datetime import datetime, timedelta
 
-
+AUTO_SHUTOFF = True
 LOW_POWER_MODE = False
 def setLowPowerMode(state):
     global LOW_POWER_MODE
@@ -42,21 +43,48 @@ def mainLoop():
     print('Ready')
 
     exit = False
+    actionDone = True
+    sleepTime = None
+    powerOffTime = None
     while not exit:
         try:
+            now = datetime.now()
+            if actionDone:
+                print("> Action Done")
+                sleepTime = now + timedelta(minutes=5)
+                powerOffTime = now + timedelta(minutes=60)
+                print("> Next Sleep:", sleepTime)
+                setLowPowerMode(False)
+                actionDone = False
+            
+            if now > sleepTime:
+                setLowPowerMode(True)
+                audio.tryPlayFile("./OLD/fart-2.wav")
+                sleepTime = now + timedelta(seconds=100)
+            
+            if now > powerOffTime:
+                if AUTO_SHUTOFF:
+                    powerOff()
+                powerOffTime = now + timedelta(seconds=100)
+
+
+
             # print('> Waiting for Chip:')
 
             id, text = reader.read_no_block()
             if id:
+                actionDone = True
                 audio.tryPlayPlaylist(id)
                 sleep(0.5)
                 continue
             
             if btn.getBtn(1):
+                actionDone = True
                 audio.tryPlayFile("./OLD/draw.mp3")
                 continue
             
             if not btn.getBtn(2):
+                actionDone = True
                 powerOff()
                 continue
             
