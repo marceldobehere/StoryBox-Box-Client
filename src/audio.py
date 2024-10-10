@@ -7,16 +7,6 @@ import src.btn as btn
 import random
 secure_random = random.SystemRandom()
 
-# playlist = {}
-# testPlayList = {
-#     "12345": "draw.mp3",
-#     "874127460810": "t.mp3",
-#     "338358677895": "nokia klingel.wav",
-#     "682123768128": "scream.mp3",
-#     "528310846334": "bruh.wav",
-#     "541262328181": "fart-2.wav"
-# }
-
 playlistMap = {}
 testPlaylistMap = [
     {
@@ -125,15 +115,6 @@ def savePlaylistData(new_playlists):
     global playlistMap
     playlistMap = new_playlists
     files.writeFile("./data/song_map.json", json.dumps(playlistMap, indent=4))
-
-
-
-
-
-
-
-
-
 
 
 

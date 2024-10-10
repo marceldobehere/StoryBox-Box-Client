@@ -71,38 +71,16 @@ def mainLoop():
     GPIO.cleanup()
 
 
-# print("File Test: " + str(network.getTestFile(2)))
-
-# syncStuff.performSync()
-#
 
 timestamp.printTimeLog("Play Audio")
 audio.tryPlayFile("./OLD/draw.mp3")
 
+
 timestamp.printTimeLog("Start sync loop")
 syncStuff.startSyncLoop()
+
 
 timestamp.printTimeLog("Main loop")
 mainLoop()
 timestamp.printTimeLog("Exit")
 exit(0)
-
-# try:
-#     id, text = reader.read()
-#     print(id)
-#     print(text)
-# finally:
-#     pass
-
-# try:
-#     text = input('New data:')
-#     print("Now place your tag to write")
-#     # reader.write(text)
-#     print("Written")
-# finally:
-#     pass
-
-
-# GPIO.cleanup()
-
-
