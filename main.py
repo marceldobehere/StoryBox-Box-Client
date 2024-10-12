@@ -36,7 +36,7 @@ timestamp.printTimeLog("Post init")
 
 def powerOff():
     print("> Shutting off")
-    print(" > Result: ", call("sudo nohup shutdown -h now", shell=True))
+    print(" > Result: ", call("sudo nohup shutdown", shell=True))
 
 def mainLoop():
     reader = SimpleMFRC522()
@@ -60,12 +60,12 @@ def mainLoop():
             if now > sleepTime:
                 setLowPowerMode(True)
                 audio.tryPlayFile("./OLD/fart-2.wav")
-                sleepTime = now + timedelta(seconds=100)
+                sleepTime = now + timedelta(seconds=200)
             
             if now > powerOffTime:
                 if AUTO_SHUTOFF:
                     powerOff()
-                powerOffTime = now + timedelta(seconds=100)
+                powerOffTime = now + timedelta(seconds=600)
 
 
 
@@ -83,9 +83,10 @@ def mainLoop():
                 audio.tryPlayFile("./OLD/draw.mp3")
                 continue
             
-            if not btn.getBtn(2):
+            if btn.getBtn(2):
                 actionDone = True
-                powerOff()
+                sleep(1.1)
+                # powerOff()
                 continue
             
             if LOW_POWER_MODE:
@@ -99,6 +100,15 @@ def mainLoop():
     GPIO.cleanup()
 
 
+
+def testLoop():
+    while True:
+        btns = btn.getBtns()
+        print(btns)
+        sleep(0.5)
+
+
+# testLoop()
 
 timestamp.printTimeLog("Play Audio")
 audio.tryPlayFile("./OLD/draw.mp3")
