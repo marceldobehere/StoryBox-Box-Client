@@ -5,6 +5,7 @@ import os.path
 import json
 import src.btn as btn
 import random
+import src.volume as volume
 secure_random = random.SystemRandom()
 
 playlistMap = {}
@@ -63,7 +64,7 @@ def tryPlayFile(path):
     print(" > Playing: " + path)
 
     player = vlc.MediaPlayer(path)
-    player.audio_set_volume(100)
+    player.audio_set_volume(volume.box_volume)
     
     print('  > Play')
     player.play()
@@ -76,10 +77,14 @@ def tryPlayFile(path):
         if btn.getBtn(0):
             print('  > Force Stop')
             break
+        volume.volume_btn_check()
+        player.audio_set_volume(volume.box_volume)
         sleep(0.1)
 
     print('  > Stop')
     player.stop()
+    while btn.getBtn(0):
+        sleep(0.1)
 
 def findPlaylist(playlist_id):
     for playlist in playlistMap:

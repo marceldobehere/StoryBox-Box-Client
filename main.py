@@ -5,6 +5,7 @@ from mfrc522 import SimpleMFRC522
 from time import sleep
 from subprocess import call
 
+import src.volume as volume
 import src.files as files
 import src.audio as audio
 import src.btn as btn
@@ -27,6 +28,7 @@ try:
     btn.initButtons()
     boxData.initBoxData()
     audio.initPlaylistData()
+    volume.init_volume()
 except Exception as error:
     print("ERROR DURING INIT: " + str(error))
     exit(-1)
@@ -78,15 +80,14 @@ def mainLoop():
                 sleep(0.5)
                 continue
             
-            if btn.getBtn(1):
+            if btn.getBtn(0):
                 actionDone = True
+                sleep(0.3)
                 audio.tryPlayFile("./OLD/draw.mp3")
                 continue
             
-            if btn.getBtn(2):
+            if volume.volume_btn_check():
                 actionDone = True
-                sleep(1.1)
-                # powerOff()
                 continue
             
             if LOW_POWER_MODE:
