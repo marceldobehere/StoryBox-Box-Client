@@ -120,16 +120,3 @@ def savePlaylistData(new_playlists):
     global playlistMap
     playlistMap = new_playlists
     files.writeFile("./data/song_map.json", json.dumps(playlistMap, indent=4))
-
-
-
-
-
-
-def getFileFromId(id):
-    res = playlist.get(str(id))
-    print('"' + str(id) + '" -> ' + str(res) + " " + str(playlist))
-    if res == None:
-        return ""
-    else:
-        return res

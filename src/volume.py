@@ -23,12 +23,12 @@ def decrease_volume():
 
 def volume_btn_check():
     if btn.getBtn(1):
-        sleep(0.2)
+        sleep(0.1)
         decrease_volume()
         return True
 
     if btn.getBtn(2):
-        sleep(0.2)
+        sleep(0.1)
         increase_volume()
         return True
 
