@@ -4,6 +4,7 @@ import RPi.GPIO as GPIO
 from mfrc522 import SimpleMFRC522
 from time import sleep
 from subprocess import call
+from datetime import datetime, timedelta
 
 import src.volume as volume
 import src.files as files
@@ -13,7 +14,8 @@ import src.boxData as boxData
 import src.network as network
 import src.syncStuff as syncStuff
 import src.timestamp as timestamp
-from datetime import datetime, timedelta
+import src.ws as ws
+
 
 AUTO_SHUTOFF = True
 LOW_POWER_MODE = False
@@ -28,7 +30,8 @@ try:
     btn.initButtons()
     boxData.initBoxData()
     audio.initPlaylistData()
-    volume.init_volume()
+    volume.initVolume()
+    ws.initWs()
 except Exception as error:
     print("ERROR DURING INIT: " + str(error))
     exit(-1)
@@ -86,7 +89,7 @@ def mainLoop():
                 audio.tryPlayFile("./OLD/draw.mp3")
                 continue
             
-            if volume.volume_btn_check():
+            if volume.volumeBtnCheck():
                 actionDone = True
                 continue
             

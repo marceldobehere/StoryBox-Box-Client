@@ -74,18 +74,19 @@ def performSync():
 
 
 # does a ping + sync every 10 minutes
-def my_function():
+def syncThreadFunc():
     try:
         network.doPing()
         performSync()
     except Exception as error:
         print("  > Error during sync: ", error) 
 
-def run_function():
-    thread = threading.Timer(60 * 10.0, run_function)
+def threadWaitLoop():
+    syncThreadFunc()
+    thread = threading.Timer(60 * 10.0, threadWaitLoop)
     thread.start()
-    sleep(5)
-    my_function()
+    
 
 def startSyncLoop():
-    run_function() # start the timer
+    thread = threading.Timer(5.0, threadWaitLoop)
+    thread.start()

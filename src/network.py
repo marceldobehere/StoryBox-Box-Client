@@ -7,7 +7,7 @@ box_server_url = "https://storybox-server-box-157863384612.us-central1.run.app"
 def getTestFile(audio_id):
     try:
         url = box_server_url + '/file/' + boxData.serialCode + '/audio/' + str(audio_id)
-        response = requests.get(url)
+        response = requests.get(url, timeout=4)
 
         print(response.status_code)
         if response.status_code != 200:
@@ -29,7 +29,7 @@ def getTestFile(audio_id):
 def getPlaylists():
     try:
         url = box_server_url + '/file/' + boxData.serialCode + '/playlists'
-        response = requests.get(url)
+        response = requests.get(url, timeout=4)
 
         print(response.status_code)
         if response.status_code != 200:
@@ -42,6 +42,6 @@ def getPlaylists():
 
 def doPing():
     try:
-        response = requests.get("https://cdn.marceldobehere.com/file/PING_FROM_PI")
+        response = requests.get("https://cdn.marceldobehere.com/file/PING_FROM_PI", timeout=4)
     except Exception as error:  
         print("  > Error during Ping: ", error) 

@@ -77,7 +77,7 @@ def tryPlayFile(path):
         if btn.getBtn(0):
             print('  > Force Stop')
             break
-        volume.volume_btn_check()
+        volume.volumeBtnCheck()
         player.audio_set_volume(volume.box_volume)
         sleep(0.1)
 
