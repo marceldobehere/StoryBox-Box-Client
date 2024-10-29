@@ -136,8 +136,8 @@ def mainLoop():
                 sleep(0.1)
         except Exception as error:
             print("ERROR IN LOOP: " + str(error))
-        finally:
             reader = SimpleMFRC522()
+        finally:
             pass
     GPIO.cleanup()
 
