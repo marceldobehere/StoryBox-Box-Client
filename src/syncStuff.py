@@ -6,6 +6,19 @@ import src.files as files
 from time import sleep
 import json
 
+def convPlaylist(playlistObj):
+    res = []
+    for id in playlistObj:
+        temp = playlistObj[id]
+        resObj = {}
+        resObj["id"] = int(id)
+        resObj["name"] = temp["name"]
+        resObj["randomPlay"] = temp["random_play"]
+        resObj["audioFiles"] = temp["audio"]
+        res.append(resObj)
+
+    return res
+
 def updatePlaylist():
     print (" > Updating Playlists")
     try:
@@ -16,8 +29,10 @@ def updatePlaylist():
     
         print("  > Parsing Playlists")
         tempPlaylist = json.loads(tempPlaylistStr)
-        # print("  > Temp Playlist:", tempPlaylist)
+        print("  > Temp Playlist:", tempPlaylist)
         # print("  > Old Playlist:", audio.playlistMap)
+        tempPlaylist = convPlaylist(tempPlaylist)
+        print("  > Temp Playlist 2:", tempPlaylist)
 
         print("  > Saving Playlists...")
         audio.savePlaylistData(tempPlaylist)

@@ -1,0 +1,34 @@
+[
+    {
+        "id": 528310846334,
+        "name": "Playlist RED CHIP",
+        "audioFiles": [
+            1,
+            2
+        ]
+    },
+    {
+        "id": 874127460810,
+        "name": "Playlist BLUE CHIP",
+        "audioFiles": [
+            4,
+            1
+        ]
+    },
+    {
+        "id": 541262328181,
+        "name": "Playlist PLUSH",
+        "audioFiles": [
+            5,
+            6,
+            7
+        ]
+    },
+    {
+        "id": 682123768128,
+        "name": "Playlist CARD",
+        "audioFiles": [
+            3
+        ]
+    }
+]

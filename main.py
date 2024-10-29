@@ -31,6 +31,11 @@ timestamp.printTimeLog("Pre init")
 try:
     btn.initButtons()
     boxData.initBoxData()
+    if not network.validateSession(boxData.serialCode):
+        print("> ERROR: BOX IS NOT VALID!!!")
+        # exit(-1)
+    else:
+        print("> Box is valid!")
     audio.initPlaylistData()
     volume.initVolume()
     ws.initWs()

@@ -5,15 +5,9 @@ KEY = [0xFF,0xFF,0xFF,0xFF,0xFF,0xFF]
 BLOCKS = []
 KEY_BLOCKS = []
 for i in range(1, 16):
-    print(i*4)
     temp = i*4
     BLOCKS.append(list(range(temp, temp + 3)))
     KEY_BLOCKS.append(temp + 3)
-
-
-print("BLOCKS: ", BLOCKS)
-
-print("KEY BLOCKS:", KEY_BLOCKS)
 
 
 def write_blocks(reader, text, blockCount):

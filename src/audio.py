@@ -13,21 +13,25 @@ testPlaylistMap = [
     {
         "id": 541262328181,
         "name": 'Playlist 1',
+        "randomPlay": 1,
         "audioFiles": [1, 2, 3]
     },
     {
         "id": 2,
         "name": 'Playlist 2',
+        "randomPlay": 0,
         "audioFiles": [1, 3]
     },
     {
         "id": 528310846334,
         "name": 'Playlist RED CHIP',
+        "randomPlay": 1,
         "audioFiles": [1, 2]
     },
     {
         "id": 874127460810,
         "name": 'Playlist BLUE CHIP',
+        "randomPlay": 1,
         "audioFiles": [3, 1]
     },
 ]
