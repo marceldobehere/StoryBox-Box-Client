@@ -1,6 +1,7 @@
 import asyncio
 import json
 import threading
+import src.files as files
 from websockets.sync.client import connect
 wsServerPath = "wss://storybox-server-box-157863384612.us-central1.run.app/ws/connect"
 
@@ -94,3 +95,8 @@ def boxStatus(status, currentToyId):
         raise Exception("INVALID STATUS")
     attachListener("box_status", boxStatusReply)
     sendData("box_status", {"status": status, "current-toy-id":currentToyId})
+
+
+def deleteBoxData():
+    files.removeFolder("./data")
+    files.removeFolder("./audios")

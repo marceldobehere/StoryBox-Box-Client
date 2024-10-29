@@ -1,5 +1,7 @@
 import os
 import os.path
+from pathlib import Path
+import shutil
 
 def readFile(path):
     f = open(path, "r")
@@ -24,3 +26,8 @@ def getFilesInFolder(path):
 def removeFile(path):
     if os.path.exists(path):
         os.remove(path)
+
+def removeFolder(path):
+    dirpath = Path(path)
+    if dirpath.exists() and dirpath.is_dir():
+        shutil.rmtree(dirpath)
