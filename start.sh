@@ -1,14 +1,8 @@
 #!/bin/bash
 echo "Date 2: $(date)"
 echo "I am $USER, with uid $UID"
-# pwd
-# ls
-
-echo "Date 3: $(date)"
 
 # pulseaudio -D
-
-echo "Date 4: $(date)"
 
 # /usr/bin/aplay /home/marcel/StoryBox-Box-Client/audios/DOWNLOAD_1.mp3
 

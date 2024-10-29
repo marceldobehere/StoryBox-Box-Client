@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import json
 import RPi.GPIO as GPIO
 from mfrc522 import SimpleMFRC522
 from time import sleep
@@ -15,6 +16,7 @@ import src.network as network
 import src.syncStuff as syncStuff
 import src.timestamp as timestamp
 import src.ws as ws
+import src.mfrcFix as MFRC_FIX
 
 
 AUTO_SHUTOFF = True
@@ -42,6 +44,38 @@ timestamp.printTimeLog("Post init")
 def powerOff():
     print("> Shutting off")
     print(" > Result: ", call("sudo nohup shutdown", shell=True))
+
+def connectInternet(ssid, password):
+    ssid = ssid.replace('"', '')
+    ssid = ssid.replace('\'', '')
+    password = password.replace('"', '')
+    password = password.replace('\'', '')
+    print("> Connecting to new WIFI: ", ssid)
+    call("sudo nmcli radio wifi on", shell=True)
+    call("sudo iwlist wlan0 scan", shell=True)
+    print("Result: ", call("sudo nmcli dev wifi connect \"" + ssid + "\" password \"" + password + "\"", shell=True))
+
+def tryParseRfidData(data):
+    if data is None:
+        return
+    data = data.strip()
+    if data == "":
+        return
+    print("DATA: \"", data, "\"")
+    
+    try:
+        obj = json.loads(data)
+        if "command" in obj:
+            command = obj["command"]
+
+            if command == "wifi-connect":
+                ssid = obj["ssid"]
+                password = obj["password"]
+                print("> Connecting to ", ssid, " with password: ", password)
+                connectInternet(ssid, password)
+
+    except Exception as error:
+        print("  > Error during text parse: ", error) 
 
 def mainLoop():
     reader = SimpleMFRC522()
@@ -74,10 +108,13 @@ def mainLoop():
 
 
 
-            # print('> Waiting for Chip:')
-
-            id, text = reader.read_no_block()
+            print('> Waiting for Chip:')
+            
+            id, text = MFRC_FIX.read_blocks(reader, 4)
             if id:
+                tryParseRfidData(text)
+                # MFRC_FIX.write_blocks(reader, '{"command":"wifi-connect", "ssid":"wifi", "password":"pass"}', 4)
+                # MFRC_FIX.write_blocks(reader, '', 4)
                 actionDone = True
                 audio.tryPlayPlaylist(id)
                 sleep(0.5)
@@ -98,8 +135,9 @@ def mainLoop():
             else:
                 sleep(0.1)
         except Exception as error:
-                print("ERROR IN LOOP: " + str(error))
+            print("ERROR IN LOOP: " + str(error))
         finally:
+            reader = SimpleMFRC522()
             pass
     GPIO.cleanup()
 
