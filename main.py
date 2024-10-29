@@ -108,10 +108,10 @@ def mainLoop():
 
 
 
-            print('> Waiting for Chip:')
-            
-            id, text = MFRC_FIX.read_blocks(reader, 4)
+            # print('> Waiting for Chip:')
+            id = reader.read_id_no_block()
             if id:
+                id, text = MFRC_FIX.read_blocks(reader, 4)
                 tryParseRfidData(text)
                 # MFRC_FIX.write_blocks(reader, '{"command":"wifi-connect", "ssid":"wifi", "password":"pass"}', 4)
                 # MFRC_FIX.write_blocks(reader, '', 4)
