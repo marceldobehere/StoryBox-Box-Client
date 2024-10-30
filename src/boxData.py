@@ -14,3 +14,14 @@ def initBoxData():
 
     accountCode = files.readFileOrDef("./data/account_code.txt", "acc_test_456")
     print("> Account Code: " + accountCode)
+
+def requireAccConnect():
+    global accountCode
+    if accountCode == "":
+        return False
+    return True
+
+def removeAccConnectionKey():
+    global accountCode
+    accountCode = ""
+    files.writeFile("./data/account_code.txt", accountCode)

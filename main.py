@@ -31,12 +31,22 @@ timestamp.printTimeLog("Pre init")
 try:
     btn.initButtons()
     boxData.initBoxData()
+
+    if boxData.requireAccConnect():
+        result = network.connectAccount(boxData.accountCode, boxData.serialCode)
+        print("> Connecting Account:: ", result)
+        boxData.removeAccConnectionKey()
+        if not result:
+            print("> ERROR: ACCOUNT SECRET KEY IS NOT VALID!!!")
+            exit(-1)
+    
     if not network.validateSession(boxData.serialCode):
         print("> ERROR: BOX IS NOT VALID!!!")
         # ws.deleteBoxData()
         # exit(-1)
     else:
         print("> Box is valid!")
+    
     audio.initPlaylistData()
     volume.initVolume()
     ws.initWs()

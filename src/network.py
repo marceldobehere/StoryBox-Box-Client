@@ -47,6 +47,29 @@ def doPing():
     except Exception as error:  
         print("  > Error during Ping: ", error) 
 
+def connectAccount(accountKey, serialKey):
+    try:
+        url = box_server_url + '/account/connect'
+        print(url)
+        obj = {
+            "account-secret-key": accountKey,
+            "serial-key": serialKey
+        }
+        response = requests.post(url, timeout=4, json=obj)
+
+        print(response.status_code, response.content)
+        if response.status_code != 200:
+            return False
+        
+        responseObj = json.loads(response.content)
+        if "success" in responseObj:
+            return responseObj["success"]
+        else:
+            return False
+    except Exception as error:
+        print("  > Error during Validate Session: ", error) 
+        return False
+
 def validateSession(serialKey):
     try:
         url = box_server_url + '/account/validate-session/' + serialKey
