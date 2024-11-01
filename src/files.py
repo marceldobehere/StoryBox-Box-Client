@@ -31,3 +31,10 @@ def removeFolder(path):
     dirpath = Path(path)
     if dirpath.exists() and dirpath.is_dir():
         shutil.rmtree(dirpath)
+
+def findFilenameThatStartsWith(folderPath, filenameStart):
+    files = getFilesInFolder(folderPath)
+    for file in files:
+        if file.startswith(filenameStart):
+            return file
+    return None 

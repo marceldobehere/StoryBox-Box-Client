@@ -79,7 +79,7 @@ def performSync():
         for file in needToDelete:
             try:
                 print("  > Deleting File: ", file)
-                files.removeFile(audio.getFileNameFromId(file, True))
+                files.removeFile(audio.getFileNameFromId(file, None))
             except Exception as error:
                 print("  > Error during deletion: ", error)
 

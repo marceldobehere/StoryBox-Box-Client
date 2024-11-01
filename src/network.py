@@ -10,12 +10,32 @@ def getTestFile(audio_id):
         url = box_server_url + '/file/' + boxData.serialCode + '/audio/' + str(audio_id)
         response = requests.get(url, timeout=4)
 
-        print(response.status_code)
+        print(f"> Network Response: {response.status_code}")
         if response.status_code != 200:
             return False
         # print(response.content)
 
-        filename = audio.getFileNameFromId(audio_id, True)
+        if not 'content-disposition' in  response.headers:
+            print("> ERR: No Content Disposition Header in: ", response.headers)
+            return False
+        contentDispositions = response.headers['content-disposition'].split(';')
+        # search for a string starting with filename=
+        downloadFilename = None
+        for entry in contentDispositions:
+            entry = entry.strip()
+            if entry.startswith("filename="):
+                downloadFilename = entry[9:]
+
+        if downloadFilename == None:
+            print("> ERR: No Filename found in: ", contentDispositions)
+            return False
+        # print(f"> FILENAME: \"{downloadFilename}\"")
+
+        fileEnding = downloadFilename.split('.')[1]
+        # print(f"> FILE ENDING: \"{fileEnding}\"")
+
+
+        filename = audio.getFileNameFromId(audio_id, fileEnding)
         # filename = "./audios/DOWNLOAD_"+str(audio_id)+".mp3"
         with open(filename, "wb") as binary_file:
             binary_file.write(response.content)
@@ -32,7 +52,7 @@ def getPlaylists():
         url = box_server_url + '/file/' + boxData.serialCode + '/playlists'
         response = requests.get(url, timeout=4)
 
-        print(response.status_code)
+        print(f"> Network Response: {response.status_code}")
         if response.status_code != 200:
             return None
         
@@ -57,7 +77,7 @@ def connectAccount(accountKey, serialKey):
         }
         response = requests.post(url, timeout=4, json=obj)
 
-        print(response.status_code, response.content)
+        print(f"> Network Response: {response.status_code}, {response.content}")
         if response.status_code != 200:
             return False
         
@@ -76,7 +96,7 @@ def validateSession(serialKey):
         print(url)
         response = requests.get(url, timeout=4)
 
-        print(response.status_code)
+        print(f"> Network Response: {response.status_code}")
         if response.status_code != 200:
             return False
         

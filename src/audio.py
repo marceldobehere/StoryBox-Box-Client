@@ -36,18 +36,28 @@ testPlaylistMap = [
     },
 ]
 
-def getFileNameFromId(id, getFullPath):
-    filename = "DOWNLOAD_" + str(id) + ".mp3"
-    if getFullPath:
-        return "./audios/" + filename
-    return filename
+# potential ending doesnt include . (e.b just "mp3")
+def getFileNameFromId(id, potentialEnding):    
+    filename = "DOWNLOAD_" + str(id) + "_"
+
+    if potentialEnding != None:
+        filename += "." + potentialEnding
+    else:
+        foundName = files.findFilenameThatStartsWith("./audios/", filename)
+        # print(f"> Found Filename: \"{foundName}\"")
+        if foundName == None:
+            print(f"> ERR: No File found for file id: {id}")
+            return ""
+        filename = foundName
+
+    return "./audios/" + filename
 
 def getDownloadedFiles():
     downloaded = files.getFilesInFolder("audios")
     print(downloaded)
     res = []
     for filename in downloaded:
-        res.append(str(filename.replace("DOWNLOAD_", "").split(".")[0]))
+        res.append(str(filename.replace("DOWNLOAD_", "").replace("_.", ".").split(".")[0]))
     return res
 
 def getAllFilesNeeded():
@@ -105,7 +115,7 @@ def tryPlayPlaylist(id):
     print(playlist)
     audioFiles = playlist["audioFiles"]
     audioFile = secure_random.choice(audioFiles)
-    audioFile = getFileNameFromId(audioFile, True)
+    audioFile = getFileNameFromId(audioFile, None)
     print(" > Picked: ", audioFile)
     tryPlayFile(audioFile)
 
