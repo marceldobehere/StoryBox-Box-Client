@@ -13,7 +13,7 @@ def convPlaylist(playlistObj):
         resObj = {}
         resObj["id"] = int(id)
         resObj["name"] = temp["name"]
-        resObj["randomPlay"] = temp["random_play"]
+        resObj["mode"] = temp["mode"]
         resObj["audioFiles"] = temp["audio"]
         res.append(resObj)
 

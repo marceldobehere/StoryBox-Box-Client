@@ -10,23 +10,28 @@ def initWs():
     thread = threading.Timer(1.0, wsLoop)
     thread.start() 
 
+websocketConn = None
+
+def sendWsObj(obj):
+    global websocketConn
+    if websocketConn == None:
+        return False
+    websocketConn.send(json.dumps(obj))
+
 def wsLoop():
+    global websocketConn
     try:
         with connect(wsServerPath) as websocket:
-            message = websocket.recv()
-            print(f" > Received: {message}")
-
-            websocket.send("Hello world!")
-
-            message = websocket.recv()
-            print(f" > Received: {message}")
+            websocketConn = websocket
+            # message = websocket.recv()
+            # print(f" > Received: {message}")
 
             while True:
                 message = websocket.recv()
-                getData(message)
-                
+                getData(message)        
     except Exception as error:
-        print("> WS ERROR: ", error)  
+        print("> WS ERROR: ", error)
+    websocketConn = None
 
 def getData(objStr):
     print(f" WS> Received: {objStr}")
@@ -75,8 +80,8 @@ def sendData(type, data):
         "data": data,
         "error": False
     }
-    objStr = json.dumps(obj)
-    print("> Sending: ", objStr)
+    print("> Sending: ", obj)
+    sendWsObj(obj)
 
 
 def authBoxReply(obj):
