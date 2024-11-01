@@ -62,6 +62,14 @@ def getData(objStr):
 # Handle a Server sent Message (e.g Delete Box)
 def handleServerMsg(obj):
     print(f" WS> Received Server Obj: {obj}")
+    if obj["error"]:
+        return
+
+    if obj["type"] == "delete_box":
+        print(f"> DELETE BOX SENT!!!")
+        sendData("delete_box", {})
+        deleteBoxData()
+
 
 listenerDict = {}
 
@@ -109,6 +117,8 @@ def authBox(serialId):
 
 def boxStatusReply(obj):
     print(f" > Box Status Reply: {obj}")
+    if obj["error"]:
+        print("> ERR: WEBSOCKET STATUS ERR: ", obj["error"])
 
 def boxStatus(status, currentToyId, currentAudioId):
     if status != "IDLE" and status != "PLAYING":
@@ -120,9 +130,23 @@ def boxStatus(status, currentToyId, currentAudioId):
 def deleteBoxData():
     files.removeFolder("./data")
     files.removeFolder("./audios")
+    print("> TODO: COMMENT OUT RESTART CODE!!!!!")
     # restart()
 
 
 def restart():
     print("> Restarting")
     print(" > Result: ", call("sudo reboot", shell=True))
+
+
+
+
+# Testing Delete Box Message
+def boxDeleteTest():
+    handleServerMsg({"type": "delete_box", "data": {}, "error": False})
+
+if False:
+    thread = threading.Timer(5.0, boxDeleteTest)
+    thread.start() 
+
+

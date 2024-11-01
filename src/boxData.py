@@ -12,7 +12,7 @@ def initBoxData():
     serialCode = files.readFileOrDef("./data/serial_code.txt", "test-serial1")
     print("> Serial Code: " + serialCode)
 
-    accountCode = files.readFileOrDef("./data/account_code.txt", "acc_test_456")
+    accountCode = files.readFileOrDef("./data/account_code.txt", "") # TODO: Add default test connect code here
     print("> Account Code: " + accountCode)
 
 def requireAccConnect():
