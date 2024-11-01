@@ -6,6 +6,8 @@ import json
 import src.btn as btn
 import random
 import src.volume as volume
+import src.ws as ws
+
 secure_random = random.SystemRandom()
 
 playlistMap = {}
@@ -105,19 +107,22 @@ def findPlaylist(playlist_id):
         if str(playlist["id"]) == str(playlist_id):
             return playlist
 
-def tryPlayPlaylist(id):
-    print(' > Attempting to play random song from Playlist with ID: ' + str(id))
-    playlist = findPlaylist(str(id))
+def tryPlayPlaylist(playlistId):
+    print(' > Attempting to play random song from Playlist with ID: ' + str(playlistId))
+    playlist = findPlaylist(str(playlistId))
     if playlist is None:
         print(" > Playlist not found!")
         sleep(0.5)
         return
     print(playlist)
     audioFiles = playlist["audioFiles"]
-    audioFile = secure_random.choice(audioFiles)
-    audioFile = getFileNameFromId(audioFile, None)
+    audioFileId = secure_random.choice(audioFiles)
+    audioFile = getFileNameFromId(audioFileId, None)
     print(" > Picked: ", audioFile)
+
+    ws.boxStatus("PLAYING", playlistId, audioFileId)
     tryPlayFile(audioFile)
+    ws.boxStatus("IDLE", None, None)
 
 
 def initPlaylistData():

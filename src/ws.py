@@ -1,6 +1,7 @@
 import asyncio
 import json
 import os
+from subprocess import call
 import threading
 from time import sleep
 import src.files as files
@@ -101,17 +102,27 @@ def authBox(serialId):
     attachListener("auth_box", authBoxReply)
     sendData("auth_box", {"id": serialId})
 
+    # Not sure if we need it
+    # Maybe something like ONLINE?
+    # boxStatus("IDLE", None, None)
+
 
 def boxStatusReply(obj):
     print(f" > Box Status Reply: {obj}")
 
-def boxStatus(status, currentToyId):
+def boxStatus(status, currentToyId, currentAudioId):
     if status != "IDLE" and status != "PLAYING":
         raise Exception("INVALID STATUS")
     attachListener("box_status", boxStatusReply)
-    sendData("box_status", {"status": status, "current-toy-id":currentToyId})
+    sendData("box_status", {"status": status, "current-toy-id":currentToyId, "current-audio-id": currentAudioId})
 
 
 def deleteBoxData():
     files.removeFolder("./data")
     files.removeFolder("./audios")
+    # restart()
+
+
+def restart():
+    print("> Restarting")
+    print(" > Result: ", call("sudo reboot", shell=True))
