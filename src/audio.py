@@ -11,29 +11,30 @@ import src.ws as ws
 secure_random = random.SystemRandom()
 
 playlistMap = {}
+playlistLastSongMap = {}
 testPlaylistMap = [
     {
         "id": 541262328181,
         "name": 'Playlist 1',
-        "randomPlay": 1,
+        "mode": "random",
         "audioFiles": [1, 2, 3]
     },
     {
         "id": 2,
         "name": 'Playlist 2',
-        "randomPlay": 0,
+        "mode": "random",
         "audioFiles": [1, 3]
     },
     {
         "id": 528310846334,
         "name": 'Playlist RED CHIP',
-        "randomPlay": 1,
+        "mode": "sequential",
         "audioFiles": [1, 2]
     },
     {
         "id": 874127460810,
         "name": 'Playlist BLUE CHIP',
-        "randomPlay": 1,
+        "mode": "sequential",
         "audioFiles": [3, 1]
     },
 ]
@@ -106,6 +107,51 @@ def findPlaylist(playlist_id):
     for playlist in playlistMap:
         if str(playlist["id"]) == str(playlist_id):
             return playlist
+    return None
+
+
+def pickNextSong(playlist, playlist_id):
+    global playlistLastSongMap
+    id = str(playlist_id)
+
+    print(f"> Picking next song for playlist: {id}")
+    print(playlist)
+    next_audio_id = None
+    audioIds = playlist["audioFiles"]
+
+    if len(audioIds) == 0:
+        print("> ERR: PLAYLIST HAS NO AUDIOS: ", playlist)
+        return None
+
+    if playlist["mode"] == "random":
+        next_audio_id = secure_random.choice(audioIds)
+
+    elif playlist["mode"] == "sequential":
+        last_song = None
+        last_song_id = None
+        id = str(playlist_id)
+        if id in playlistLastSongMap:
+            last_song = playlistLastSongMap[id]
+            last_song_id = last_song["audio_id"]
+            if not last_song_id in audioIds:
+                last_song_id = None
+        print(f" > Last Song: ", last_song)
+
+        if last_song_id == None:
+            return audioIds[0]
+        else:
+            audioIndex = audioIds.index(last_song_id)
+            audioIndex = (audioIndex + 1) % len(audioIds)
+            return audioIds[audioIndex]
+
+    else:
+        print("> ERR: UNKOWN PLAYLIST MODE: ", playlist["mode"])
+        return None
+
+    return next_audio_id
+
+
+
 
 def tryPlayPlaylist(playlistId):
     print(' > Attempting to play random song from Playlist with ID: ' + str(playlistId))
@@ -115,27 +161,43 @@ def tryPlayPlaylist(playlistId):
         sleep(0.5)
         return
     print(playlist)
-    audioFiles = playlist["audioFiles"]
-    audioFileId = secure_random.choice(audioFiles)
+    audioFileId = pickNextSong(playlist, playlistId)
     audioFile = getFileNameFromId(audioFileId, None)
     print(" > Picked: ", audioFile)
 
     ws.boxStatus("PLAYING", playlistId, audioFileId)
+    saveCurrentPlayingSong(playlistId, audioFileId)
     tryPlayFile(audioFile)
     ws.boxStatus("IDLE", None, None)
 
 
 def initPlaylistData():
-    global playlistMap
+    global playlistMap, playlistLastSongMap
     if not os.path.exists("audios"):
         os.makedirs("audios")
 
-    playlistStr = files.readFileOrDef("./data/song_map.json", json.dumps(testPlaylistMap, indent=4))
+    # playlistStr = files.readFileOrDef("./data/song_map.json", json.dumps(testPlaylistMap, indent=4))
+    playlistStr = files.readFileOrDef("./data/song_map.json", "[]")
     playlistMap = json.loads(playlistStr)
     # print("> Playlist: " + json.dumps(playlistMap))
+
+    playlistLastSongStr = files.readFileOrDef("./data/last_song_map.json", "{}")
+    playlistLastSongMap = json.loads(playlistLastSongStr)
 
 
 def savePlaylistData(new_playlists):
     global playlistMap
     playlistMap = new_playlists
     files.writeFile("./data/song_map.json", json.dumps(playlistMap, indent=4))
+
+def savePlaylistLastSong(new_lastsong):
+    global playlistLastSongMap
+    playlistLastSongMap = new_lastsong
+    files.writeFile("./data/last_song_map.json", json.dumps(playlistLastSongMap, indent=4))
+
+def saveCurrentPlayingSong(playlist_id, audio_id):
+    global playlistLastSongMap
+    playlistLastSongMap[str(playlist_id)] = {
+        "audio_id": audio_id
+    }
+    savePlaylistLastSong(playlistLastSongMap)
