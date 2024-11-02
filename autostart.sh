@@ -12,4 +12,4 @@ echo "> Doing Autostart"
 # sleep 2s
 
 echo "> Starting Program"
-sudo -H -u marcel bash ./start.sh
+sudo -H -u marcel bash ./start.sh abc
