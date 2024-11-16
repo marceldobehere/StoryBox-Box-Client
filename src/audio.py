@@ -90,16 +90,36 @@ def tryPlayFile(path, updateFunc):
     Ended = 6
     updateFreq = 2000 # 2 seconds
     lastTime = player.get_time() // updateFreq
+    lastPaused = False
     while True:
         if player.get_state() == Ended:
             break
+
         if btn.getBtn(0):
-            print('  > Force Stop')
-            break
-        localLastTime = player.get_time() // updateFreq
-        if updateFunc is not None and localLastTime > lastTime:
-            lastTime = localLastTime
-            updateFunc(player.get_time())
+            # print('  > Force Stop')
+            # break
+            if player.is_playing():
+                player.pause()
+            else:
+                player.play()
+            print(f'  > Setting Paused to {player.is_playing()}')
+            sleep(0.2)
+
+
+        if updateFunc is not None:
+            localLastTime = player.get_time() // updateFreq
+            localPaused = not player.is_playing()
+            sendUpdate = False
+
+            if localLastTime > lastTime:
+                lastTime = localLastTime
+                sendUpdate = True
+            if localPaused != lastPaused:
+                lastPaused = localPaused
+                sendUpdate = True
+
+            if sendUpdate:
+                updateFunc(player.get_time(), localPaused)
 
         volume.volumeBtnCheck()
         player.audio_set_volume(volume.box_volume)
@@ -158,12 +178,15 @@ def pickNextSong(playlist, playlist_id):
     return next_audio_id
 
 
-def updateTimestamp(toyId, audioId, timeMs):
-    print(f"> New Timestamp: {timeMs}ms, (Toy: {toyId}, Audio: {audioId})")
-    ws.boxStatus("PLAYING", toyId, audioId, timeMs)
+def updateTimestamp(toyId, audioId, timeMs, paused):
+    print(f"> New Timestamp: {timeMs}ms, (Paused: {paused}, Toy: {toyId}, Audio: {audioId})")
+    if paused:
+        ws.boxStatus("PAUSED", toyId, audioId, timeMs)
+    else:
+        ws.boxStatus("PLAYING", toyId, audioId, timeMs)
 
 def updateTimestampFunc(toyId, audioId):
-    return lambda timeS : updateTimestamp(toyId, audioId, timeS)
+    return lambda timeMs, paused : updateTimestamp(toyId, audioId, timeMs, paused)
 
 def tryPlayPlaylist(playlistId):
     print(' > Attempting to play random song from Playlist with ID: ' + str(playlistId))

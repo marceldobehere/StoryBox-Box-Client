@@ -123,7 +123,7 @@ def boxStatusReply(obj):
         print("> ERR: WEBSOCKET STATUS ERR: ", obj["error"])
 
 def boxStatus(status, currentToyId, currentAudioId, timestampMs):
-    if status != "IDLE" and status != "PLAYING":
+    if status != "IDLE" and status != "PLAYING" and status != "PAUSED":
         raise Exception("INVALID STATUS")
     attachListener("box_status", boxStatusReply)
     sendData("box_status", {
