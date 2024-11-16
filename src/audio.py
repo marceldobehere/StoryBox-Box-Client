@@ -72,8 +72,29 @@ def getAllFilesNeeded():
 
     return res
 
+AUDIO_COMMAND = None
+AUDIO_COMMAND_ARG = None
+# COMMANDS ["PAUSE", "RESUME", "STOP", "SKIP_TIME"]
+
+def cmdPause():
+    global AUDIO_COMMAND, AUDIO_COMMAND_ARG
+    AUDIO_COMMAND_ARG = None
+    AUDIO_COMMAND = "PAUSE"
+def cmdResume():
+    global AUDIO_COMMAND, AUDIO_COMMAND_ARG
+    AUDIO_COMMAND_ARG = None
+    AUDIO_COMMAND = "RESUME"
+def cmdStop():
+    global AUDIO_COMMAND, AUDIO_COMMAND_ARG
+    AUDIO_COMMAND_ARG = None
+    AUDIO_COMMAND = "STOP"
+def cmdSkipTime(amt):
+    global AUDIO_COMMAND, AUDIO_COMMAND_ARG
+    AUDIO_COMMAND_ARG = amt
+    AUDIO_COMMAND = "SKIP_TIME"
 
 def tryPlayFile(path, updateFunc):
+    global AUDIO_COMMAND, AUDIO_COMMAND_ARG
     if path == "" or not files.fileExists(path):
         print(' > Unkown Path! ', path)
         sleep(1)
@@ -91,6 +112,7 @@ def tryPlayFile(path, updateFunc):
     updateFreq = 2000 # 2 seconds
     lastTime = player.get_time() // updateFreq
     lastPaused = False
+    AUDIO_COMMAND = None
     while True:
         if player.get_state() == Ended:
             break
@@ -98,11 +120,14 @@ def tryPlayFile(path, updateFunc):
         if btn.getBtn(0):
             # print('  > Force Stop')
             # break
+
             if player.is_playing():
                 player.pause()
             else:
                 player.play()
             print(f'  > Setting Paused to {player.is_playing()}')
+
+            # cmdSkipTime(-2*1000)
             sleep(0.2)
 
 
@@ -120,6 +145,27 @@ def tryPlayFile(path, updateFunc):
 
             if sendUpdate:
                 updateFunc(player.get_time(), localPaused)
+
+        if AUDIO_COMMAND is not None:
+            print("> Doing Audio Command: ", AUDIO_COMMAND, ", Arg: ", AUDIO_COMMAND_ARG)
+            if AUDIO_COMMAND == "PAUSE":
+                player.pause()
+            elif AUDIO_COMMAND == "RESUME":
+                player.play()
+            elif AUDIO_COMMAND == "STOP":
+                break
+            elif AUDIO_COMMAND == "SKIP_TIME":
+                length = max(1, player.get_length())
+                newPercent = (player.get_time() + AUDIO_COMMAND_ARG) / length
+                newPercent = min(newPercent, 1)
+                newPercent = max(newPercent, 0)
+                player.set_position(newPercent)
+            else:
+                print("> Unknown Command: ", AUDIO_COMMAND)
+            
+
+            AUDIO_COMMAND = None
+            AUDIO_COMMAND_ARG = None
 
         volume.volumeBtnCheck()
         player.audio_set_volume(volume.box_volume)
