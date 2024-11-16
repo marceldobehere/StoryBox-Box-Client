@@ -27,18 +27,20 @@ def sendWsObj(obj):
 
 def wsLoop():
     global websocketConn
-    try:
-        with connect(wsServerPath) as websocket:
-            websocketConn = websocket
+    while True:
+        try:
+            print("> WS (RE)CONNECT: ")
+            with connect(wsServerPath) as websocket:
+                websocketConn = websocket
 
-            authBox(boxData.serialCode)
+                authBox(boxData.serialCode)
 
-            while True:
-                message = websocket.recv()
-                getData(message)        
-    except Exception as error:
-        print("> WS ERROR: ", error)
-    websocketConn = None
+                while True:
+                    message = websocket.recv()
+                    getData(message)        
+        except Exception as error:
+            print("> WS ERROR: ", error)
+        websocketConn = None
 
 def getData(objStr):
     # print(f" WS> Received: {objStr}")
@@ -57,7 +59,7 @@ def getData(objStr):
         
     except Exception as error:
         print(f" WS> Received: {objStr}")
-        print("> WS ERROR: ", error)  
+        print("> WS ERROR 2: ", error)  
 
 # Handle a Server sent Message (e.g Delete Box)
 def handleServerMsg(obj):
@@ -120,11 +122,16 @@ def boxStatusReply(obj):
     if obj["error"]:
         print("> ERR: WEBSOCKET STATUS ERR: ", obj["error"])
 
-def boxStatus(status, currentToyId, currentAudioId):
+def boxStatus(status, currentToyId, currentAudioId, timestampMs):
     if status != "IDLE" and status != "PLAYING":
         raise Exception("INVALID STATUS")
     attachListener("box_status", boxStatusReply)
-    sendData("box_status", {"status": status, "current-toy-id":currentToyId, "current-audio-id": currentAudioId})
+    sendData("box_status", {
+        "status": status, 
+        "current-toy-id":currentToyId, 
+        "current-audio-id": currentAudioId,
+        "current-audio-time": timestampMs
+    })
 
 
 def deleteBoxData():

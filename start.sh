@@ -14,6 +14,6 @@ if [ $# -eq 0 ]; then
     python3 -u main.py 
 else
     nl=$'\n\n\n'
-    echo "${nl}---- START AT $(date) ----${nl}" >> /tmp/storybox_autostart.log
-    nohup python3 -u main.py >> /tmp/storybox_autostart.log
+    echo "${nl}---- START AT $(date) ----${nl}" >> bruh.log
+    nohup python3 -u main.py >> bruh.log
 fi

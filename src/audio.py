@@ -73,7 +73,7 @@ def getAllFilesNeeded():
     return res
 
 
-def tryPlayFile(path):
+def tryPlayFile(path, updateFunc):
     if path == "" or not files.fileExists(path):
         print(' > Unkown Path! ', path)
         sleep(1)
@@ -88,12 +88,19 @@ def tryPlayFile(path):
     
     print('  > Wait')
     Ended = 6
+    updateFreq = 2000 # 2 seconds
+    lastTime = player.get_time() // updateFreq
     while True:
         if player.get_state() == Ended:
             break
         if btn.getBtn(0):
             print('  > Force Stop')
             break
+        localLastTime = player.get_time() // updateFreq
+        if updateFunc is not None and localLastTime > lastTime:
+            lastTime = localLastTime
+            updateFunc(player.get_time())
+
         volume.volumeBtnCheck()
         player.audio_set_volume(volume.box_volume)
         sleep(0.1)
@@ -151,7 +158,12 @@ def pickNextSong(playlist, playlist_id):
     return next_audio_id
 
 
+def updateTimestamp(toyId, audioId, timeMs):
+    print(f"> New Timestamp: {timeMs}ms, (Toy: {toyId}, Audio: {audioId})")
+    ws.boxStatus("PLAYING", toyId, audioId, timeMs)
 
+def updateTimestampFunc(toyId, audioId):
+    return lambda timeS : updateTimestamp(toyId, audioId, timeS)
 
 def tryPlayPlaylist(playlistId):
     print(' > Attempting to play random song from Playlist with ID: ' + str(playlistId))
@@ -165,10 +177,10 @@ def tryPlayPlaylist(playlistId):
     audioFile = getFileNameFromId(audioFileId, None)
     print(" > Picked: ", audioFile)
 
-    ws.boxStatus("PLAYING", playlistId, audioFileId)
+    ws.boxStatus("PLAYING", playlistId, audioFileId, 0)
     saveCurrentPlayingSong(playlistId, audioFileId)
-    tryPlayFile(audioFile)
-    ws.boxStatus("IDLE", None, None)
+    tryPlayFile(audioFile, updateTimestampFunc(playlistId, audioFileId))
+    ws.boxStatus("IDLE", None, None, None)
 
 
 def initPlaylistData():

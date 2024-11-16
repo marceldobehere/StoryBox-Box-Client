@@ -43,7 +43,7 @@ try:
     if not network.validateSession(boxData.serialCode):
         print("> ERROR: BOX IS NOT VALID!!!")
         # ws.deleteBoxData()
-        # exit(-1)
+        exit(-1)
     else:
         print("> Box is valid!")
     
@@ -114,7 +114,7 @@ def mainLoop():
             
             if now > sleepTime:
                 setLowPowerMode(True)
-                audio.tryPlayFile("./OLD/fart-2.wav")
+                audio.tryPlayFile("./OLD/fart-2.wav", None)
                 sleepTime = now + timedelta(seconds=200)
             
             if now > powerOffTime:
@@ -139,7 +139,7 @@ def mainLoop():
             if btn.getBtn(0):
                 actionDone = True
                 sleep(0.3)
-                audio.tryPlayFile("./OLD/draw.mp3")
+                audio.tryPlayFile("./OLD/draw.mp3", None)
                 continue
             
             if volume.volumeBtnCheck():
@@ -169,7 +169,7 @@ def testLoop():
 # testLoop()
 
 timestamp.printTimeLog("Play Audio")
-audio.tryPlayFile("./OLD/draw.mp3")
+audio.tryPlayFile("./OLD/draw.mp3", None)
 
 
 timestamp.printTimeLog("Start sync loop")
