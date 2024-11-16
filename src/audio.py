@@ -130,22 +130,6 @@ def tryPlayFile(path, updateFunc):
             # cmdSkipTime(-2*1000)
             sleep(0.2)
 
-
-        if updateFunc is not None:
-            localLastTime = player.get_time() // updateFreq
-            localPaused = not player.is_playing()
-            sendUpdate = False
-
-            if localLastTime > lastTime:
-                lastTime = localLastTime
-                sendUpdate = True
-            if localPaused != lastPaused:
-                lastPaused = localPaused
-                sendUpdate = True
-
-            if sendUpdate:
-                updateFunc(player.get_time(), localPaused)
-
         if AUDIO_COMMAND is not None:
             print("> Doing Audio Command: ", AUDIO_COMMAND, ", Arg: ", AUDIO_COMMAND_ARG)
             if AUDIO_COMMAND == "PAUSE":
@@ -163,9 +147,24 @@ def tryPlayFile(path, updateFunc):
             else:
                 print("> Unknown Command: ", AUDIO_COMMAND)
             
-
             AUDIO_COMMAND = None
             AUDIO_COMMAND_ARG = None
+
+
+        if updateFunc is not None:
+            localLastTime = player.get_time() // updateFreq
+            localPaused = not player.is_playing()
+            sendUpdate = False
+
+            if localLastTime > lastTime:
+                lastTime = localLastTime
+                sendUpdate = True
+            if localPaused != lastPaused:
+                lastPaused = localPaused
+                sendUpdate = True
+
+            if sendUpdate:
+                updateFunc(player.get_time(), localPaused)
 
         volume.volumeBtnCheck()
         player.audio_set_volume(volume.box_volume)

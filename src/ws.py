@@ -7,6 +7,7 @@ from time import sleep
 import src.files as files
 from websockets.sync.client import connect
 import src.boxData as boxData
+import src.audio as audio
 
 wsServerPath = "wss://storybox-server-box-157863384612.us-central1.run.app/ws/connect"
 
@@ -71,6 +72,17 @@ def handleServerMsg(obj):
         print(f"> DELETE BOX SENT!!!")
         sendData("delete_box", {})
         deleteBoxData()
+    
+    if obj["type"] == "audio_command":
+        print("> Audio Command")
+        try:
+            data = obj["data"]
+            arg = None
+            if "arg" in data:
+                arg = data["arg"]
+            sendData("audio_command", handleAudioCommand(data["command"], arg))
+        except Exception as error:
+            sendWsObj({"type": "audio_command", "error": True, "data": str(error)})
 
 
 listenerDict = {}
@@ -141,6 +153,23 @@ def deleteBoxData():
     # restart()
 
 
+def handleAudioCommand(command, arg):
+    print(f"> Handling Audio Command {command}, arg: {arg}")
+
+    if command == "PAUSE":
+        audio.cmdPause()
+    elif command == "RESUME":
+        audio.cmdResume()
+    elif command == "STOP":
+        audio.cmdStop()
+    elif command == "SKIP_TIME":
+        if arg is not None:
+            audio.cmdSkipTime(arg)
+        else:
+            raise Exception("NO SKIP TIME PROVIDED")
+
+    return {}
+
 def restart():
     print("> Restarting")
     print(" > Result: ", call("sudo reboot", shell=True))
@@ -152,8 +181,16 @@ def restart():
 def boxDeleteTest():
     handleServerMsg({"type": "delete_box", "data": {}, "error": False})
 
+def boxCmdTest():
+    handleServerMsg({"type": "audio_command", "data": {"command":"SKIP_TIME", "arg": 20000}, "error": False})
+
 if False:
     thread = threading.Timer(5.0, boxDeleteTest)
+    thread.start() 
+
+
+if False:
+    thread = threading.Timer(15.0, boxCmdTest)
     thread.start() 
 
 
