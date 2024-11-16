@@ -1,25 +1,39 @@
 from time import sleep
 import src.btn as btn
+import src.files as files
 box_volume = 50
 
-def initVolume():
+def saveVolume(new_volume):
     global box_volume
-    box_volume = 50
+
+    if new_volume > 100:
+        new_volume = 100
+    if new_volume < 0:
+        new_volume = 0
+    
+    box_volume = new_volume
     print("> Updating Box Volume to: ", box_volume)
+    files.writeFile("./data/volume.txt", str(box_volume))
+    
+def initVolume():
+    boxVolume = files.readFileOrDef("./data/volume.txt", "50")
+    print("> Loaded Volume: " + boxVolume)
+
+    volume = 50
+    try:
+        volume = int(boxVolume)
+    except:
+        pass
+
+    saveVolume(volume)
 
 def increaseVolume():
     global box_volume
-    box_volume += 5
-    if box_volume > 100:
-        box_volume = 100
-    print("> Updating Box Volume to: ", box_volume)
+    saveVolume(box_volume + 5)
 
 def decreaseVolume():
     global box_volume
-    box_volume -= 5
-    if box_volume < 0:
-        box_volume = 0
-    print("> Updating Box Volume to: ", box_volume)
+    saveVolume(box_volume - 5)
 
 def volumeBtnCheck():
     if btn.getBtn(1):
