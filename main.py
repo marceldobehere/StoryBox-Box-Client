@@ -26,6 +26,10 @@ def setLowPowerMode(state):
     LOW_POWER_MODE = state
     print("> Set Low Power Mode To: ", LOW_POWER_MODE)
 
+def enableInternet():
+    call("sudo nmcli radio wifi on", shell=True)
+    call("sudo iwlist wlan0 scan", shell=True)
+
 timestamp.printTimeLog("Pre init")
 
 try:
@@ -45,6 +49,7 @@ try:
     if not network.validateSession(boxData.serialCode):
         print("> ERROR: BOX IS NOT VALID!!!")
         audio.tryPlayFile("./OLD/bruh.wav", None) # WARNING SOUND IF BOX IS NOT VALID / THERE IS NO INTERNET
+        enableInternet() # Re-Enable WIFI just in case
         # ws.deleteBoxData()
         # exit(-1)
     else:
@@ -68,8 +73,7 @@ def connectInternet(ssid, password):
     password = password.replace('"', '')
     password = password.replace('\'', '')
     print("> Connecting to new WIFI: ", ssid)
-    call("sudo nmcli radio wifi on", shell=True)
-    call("sudo iwlist wlan0 scan", shell=True)
+    enableInternet()
     print("Result: ", call("sudo nmcli dev wifi connect \"" + ssid + "\" password \"" + password + "\"", shell=True))
 
 def tryParseRfidData(data):
