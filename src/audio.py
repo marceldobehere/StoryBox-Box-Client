@@ -1,4 +1,4 @@
-from time import sleep
+from time import sleep, time
 import vlc
 import src.files as files
 import os.path
@@ -118,15 +118,26 @@ def tryPlayFile(path, updateFunc):
             break
 
         if btn.getBtn(0):
-            # temp
-            print('  > Force Stop')
-            break
+            was_playing = player.is_playing()
+        
+            if not was_playing:
+                timeA = time()
+                while btn.getBtn(0) and time() - timeA < 0.8:
+                    sleep(0.1)
+                timeDiff = time() - timeA
+                if timeDiff > 0.7:
+                    print('  > Force Stop')
+                    break
 
-            if player.is_playing():
+            if was_playing:
                 player.pause()
             else:
                 player.play()
-            print(f'  > Setting Paused to {player.is_playing()}')
+            print(f'  > Setting Paused to {was_playing}')
+
+            if was_playing:
+                while btn.getBtn(0):
+                    sleep(0.1)
 
             # cmdSkipTime(-2*1000)
             sleep(0.2)
