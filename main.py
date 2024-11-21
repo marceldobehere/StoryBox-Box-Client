@@ -38,14 +38,14 @@ try:
     audio.initPlaylistData()
     volume.initVolume()
 
-    for i in range(3):
+    for i in range(5):
         if network.doPing():
             break
         else:
             print("NO INTERNET")
             audio.tryPlayFile("./OLD/error.mp3", None) # NO INTERNET WARNING
             enableInternet() # Re-Enable WIFI just in case
-            sleep(2)
+            sleep(3)
 
     if boxData.requireAccConnect():
         result = network.connectAccount(boxData.accountCode, boxData.serialCode)
