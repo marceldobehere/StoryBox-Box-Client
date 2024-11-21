@@ -3,7 +3,7 @@
 import json
 import RPi.GPIO as GPIO
 from mfrc522 import SimpleMFRC522
-from time import sleep
+from time import sleep, time
 from subprocess import call
 from datetime import datetime, timedelta
 
@@ -113,7 +113,7 @@ def mainLoop():
             now = datetime.now()
             if actionDone:
                 print("> Action Done")
-                sleepTime = now + timedelta(minutes=5)
+                sleepTime = now + timedelta(minutes=3)
                 powerOffTime = now + timedelta(minutes=60)
                 print("> Next Sleep:", sleepTime)
                 setLowPowerMode(False)
@@ -122,7 +122,7 @@ def mainLoop():
             if now > sleepTime:
                 setLowPowerMode(True)
                 # audio.tryPlayFile("./OLD/fart-2.wav", None)
-                sleepTime = now + timedelta(seconds=200)
+                sleepTime = now + timedelta(minutes=10)
             
             if now > powerOffTime:
                 if AUTO_SHUTOFF:
@@ -143,11 +143,16 @@ def mainLoop():
                 sleep(0.5)
                 continue
             
-            # if btn.getBtn(0):
-            #     actionDone = True
-            #     sleep(0.3)
-            #     audio.tryPlayFile("./OLD/draw.mp3", None)
-            #     continue
+            if btn.getBtn(0):
+                actionDone = True
+                timeA = time()
+                while btn.getBtn(0) and not time() - timeA > 5:
+                    sleep(0.1)
+                if time() - timeA > 5:
+                    print("SHUTDOWNNNN")
+                    audio.tryPlayFile("./OLD/bruh.wav", None)
+                    powerOff()
+                continue
             
             if volume.volumeBtnCheck():
                 actionDone = True
