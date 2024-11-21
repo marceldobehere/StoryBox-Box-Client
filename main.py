@@ -30,7 +30,9 @@ timestamp.printTimeLog("Pre init")
 
 try:
     btn.initButtons()
-    boxData.initBoxData()
+    boxData.initBoxData()    
+    audio.initPlaylistData()
+    volume.initVolume()
 
     if boxData.requireAccConnect():
         result = network.connectAccount(boxData.accountCode, boxData.serialCode)
@@ -39,16 +41,15 @@ try:
         if not result:
             print("> ERROR: ACCOUNT SECRET KEY IS NOT VALID!!!")
             exit(-1)
-    
+
     if not network.validateSession(boxData.serialCode):
         print("> ERROR: BOX IS NOT VALID!!!")
+        audio.tryPlayFile("./OLD/bruh.wav", None) # WARNING SOUND IF BOX IS NOT VALID / THERE IS NO INTERNET
         # ws.deleteBoxData()
         # exit(-1)
     else:
         print("> Box is valid!")
-    
-    audio.initPlaylistData()
-    volume.initVolume()
+
     ws.initWs()
 except Exception as error:
     print("ERROR DURING INIT: " + str(error))
