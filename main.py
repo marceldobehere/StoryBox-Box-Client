@@ -38,6 +38,15 @@ try:
     audio.initPlaylistData()
     volume.initVolume()
 
+    for i in range(3):
+        if network.doPing():
+            break
+        else:
+            print("NO INTERNET")
+            audio.tryPlayFile("./OLD/error.mp3", None) # NO INTERNET WARNING
+            enableInternet() # Re-Enable WIFI just in case
+            sleep(2)
+
     if boxData.requireAccConnect():
         result = network.connectAccount(boxData.accountCode, boxData.serialCode)
         print("> Connecting Account:: ", result)
@@ -49,7 +58,6 @@ try:
     if not network.validateSession(boxData.serialCode):
         print("> ERROR: BOX IS NOT VALID!!!")
         audio.tryPlayFile("./OLD/bruh.wav", None) # WARNING SOUND IF BOX IS NOT VALID / THERE IS NO INTERNET
-        enableInternet() # Re-Enable WIFI just in case
         # ws.deleteBoxData()
         # exit(-1)
     else:

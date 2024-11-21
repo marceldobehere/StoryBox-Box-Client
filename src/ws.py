@@ -42,6 +42,7 @@ def wsLoop():
         except Exception as error:
             print("> WS ERROR: ", error)
         websocketConn = None
+        sleep(0.5)
 
 def getData(objStr):
     # print(f" WS> Received: {objStr}")
