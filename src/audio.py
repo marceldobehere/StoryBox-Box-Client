@@ -10,6 +10,8 @@ import src.ws as ws
 
 secure_random = random.SystemRandom()
 
+READER_REF = None
+
 playlistMap = {}
 playlistLastSongMap = {}
 testPlaylistMap = [
@@ -93,6 +95,12 @@ def cmdSkipTime(amt):
     AUDIO_COMMAND_ARG = amt
     AUDIO_COMMAND = "SKIP_TIME"
 
+
+def checkTag():
+    if READER_REF is None:
+        return False
+    return (READER_REF.read_id_no_block() is not None)
+
 def tryPlayFile(path, updateFunc):
     global AUDIO_COMMAND, AUDIO_COMMAND_ARG
     if path == "" or not files.fileExists(path):
@@ -113,74 +121,87 @@ def tryPlayFile(path, updateFunc):
     lastTime = player.get_time() // updateFreq
     lastPaused = False
     AUDIO_COMMAND = None
-    while True:
-        if player.get_state() == Ended:
-            break
-
-        if btn.getBtn(0):
-            was_playing = player.is_playing()
-        
-            if not was_playing:
-                timeA = time()
-                while btn.getBtn(0) and time() - timeA < 0.8:
-                    sleep(0.1)
-                timeDiff = time() - timeA
-                if timeDiff > 0.7:
-                    print('  > Force Stop')
-                    break
-
-            if was_playing:
-                player.pause()
-            else:
-                player.play()
-            print(f'  > Setting Paused to {was_playing}')
-
-            if was_playing:
-                while btn.getBtn(0):
-                    sleep(0.1)
-
-            # cmdSkipTime(-2*1000)
-            sleep(0.2)
-
-        if AUDIO_COMMAND is not None:
-            print("> Doing Audio Command: ", AUDIO_COMMAND, ", Arg: ", AUDIO_COMMAND_ARG)
-            if AUDIO_COMMAND == "PAUSE":
-                player.pause()
-            elif AUDIO_COMMAND == "RESUME":
-                player.play()
-            elif AUDIO_COMMAND == "STOP":
+    TAG_RESET = time() + 0.5
+    
+    try:
+        while True:
+            if player.get_state() == Ended:
                 break
-            elif AUDIO_COMMAND == "SKIP_TIME":
-                length = max(1, player.get_length())
-                newPercent = (player.get_time() + AUDIO_COMMAND_ARG) / length
-                newPercent = min(newPercent, 1)
-                newPercent = max(newPercent, 0)
-                player.set_position(newPercent)
-            else:
-                print("> Unknown Command: ", AUDIO_COMMAND)
+
+            if btn.getBtn(0):
+                was_playing = player.is_playing()
             
-            AUDIO_COMMAND = None
-            AUDIO_COMMAND_ARG = None
+                if not was_playing:
+                    timeA = time()
+                    while btn.getBtn(0) and time() - timeA < 0.8:
+                        sleep(0.1)
+                    timeDiff = time() - timeA
+                    if timeDiff > 0.7:
+                        print('  > Force Stop')
+                        break
 
+                if was_playing:
+                    player.pause()
+                else:
+                    player.play()
+                print(f'  > Setting Paused to {was_playing}')
 
-        if updateFunc is not None:
-            localLastTime = player.get_time() // updateFreq
-            localPaused = not player.is_playing()
-            sendUpdate = False
+                if was_playing:
+                    while btn.getBtn(0):
+                        sleep(0.1)
 
-            if localLastTime > lastTime:
-                lastTime = localLastTime
-                sendUpdate = True
-            if localPaused != lastPaused:
-                lastPaused = localPaused
-                sendUpdate = True
+                # cmdSkipTime(-2*1000)
+                sleep(0.2)
 
-            if sendUpdate:
-                updateFunc(player.get_time(), localPaused)
+            if AUDIO_COMMAND is not None:
+                print("> Doing Audio Command: ", AUDIO_COMMAND, ", Arg: ", AUDIO_COMMAND_ARG)
+                if AUDIO_COMMAND == "PAUSE":
+                    player.pause()
+                elif AUDIO_COMMAND == "RESUME":
+                    player.play()
+                elif AUDIO_COMMAND == "STOP":
+                    break
+                elif AUDIO_COMMAND == "SKIP_TIME":
+                    length = max(1, player.get_length())
+                    newPercent = (player.get_time() + AUDIO_COMMAND_ARG) / length
+                    newPercent = min(newPercent, 1)
+                    newPercent = max(newPercent, 0)
+                    player.set_position(newPercent)
+                else:
+                    print("> Unknown Command: ", AUDIO_COMMAND)
+                
+                AUDIO_COMMAND = None
+                AUDIO_COMMAND_ARG = None
 
-        volume.volumeBtnCheck()
-        player.audio_set_volume(volume.box_volume)
-        sleep(0.1)
+            if READER_REF is not None:
+                TAG_HERE_NOW = checkTag()
+                if TAG_HERE_NOW:
+                    if time() < TAG_RESET:
+                        TAG_RESET = time() + 1
+                    else:
+                        print("> NEW NFC TAG BWAAAA")
+                        break
+
+            if updateFunc is not None:
+                localLastTime = player.get_time() // updateFreq
+                localPaused = not player.is_playing()
+                sendUpdate = False
+
+                if localLastTime > lastTime:
+                    lastTime = localLastTime
+                    sendUpdate = True
+                if localPaused != lastPaused:
+                    lastPaused = localPaused
+                    sendUpdate = True
+
+                if sendUpdate:
+                    updateFunc(player.get_time(), localPaused)
+
+            volume.volumeBtnCheck()
+            player.audio_set_volume(volume.box_volume)
+            sleep(0.1)
+    except Exception as error:
+        print('> ERROR DURING PLAYBACK: ', error)
 
     print('  > Stop')
     player.stop()

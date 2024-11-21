@@ -100,6 +100,8 @@ def tryParseRfidData(data):
 
 def mainLoop():
     reader = SimpleMFRC522()
+    audio.READER_REF = reader
+
     print('Ready')
 
     exit = False
@@ -119,7 +121,7 @@ def mainLoop():
             
             if now > sleepTime:
                 setLowPowerMode(True)
-                audio.tryPlayFile("./OLD/fart-2.wav", None)
+                # audio.tryPlayFile("./OLD/fart-2.wav", None)
                 sleepTime = now + timedelta(seconds=200)
             
             if now > powerOffTime:
@@ -141,11 +143,11 @@ def mainLoop():
                 sleep(0.5)
                 continue
             
-            if btn.getBtn(0):
-                actionDone = True
-                sleep(0.3)
-                audio.tryPlayFile("./OLD/draw.mp3", None)
-                continue
+            # if btn.getBtn(0):
+            #     actionDone = True
+            #     sleep(0.3)
+            #     audio.tryPlayFile("./OLD/draw.mp3", None)
+            #     continue
             
             if volume.volumeBtnCheck():
                 actionDone = True
@@ -157,7 +159,8 @@ def mainLoop():
                 sleep(0.1)
         except Exception as error:
             print("ERROR IN LOOP: " + str(error))
-            reader = SimpleMFRC522()
+            reader = SimpleMFRC522()#
+            audio.READER_REF = reader
         finally:
             pass
     GPIO.cleanup()
