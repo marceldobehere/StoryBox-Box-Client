@@ -36,12 +36,12 @@ def decreaseVolume():
     saveVolume(box_volume - 5)
 
 def volumeBtnCheck():
-    if btn.getBtn(1):
+    if btn.getBtn(2):
         sleep(0.1)
         decreaseVolume()
         return True
 
-    if btn.getBtn(2):
+    if btn.getBtn(1):
         sleep(0.1)
         increaseVolume()
         return True

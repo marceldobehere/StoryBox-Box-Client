@@ -43,7 +43,7 @@ try:
     if not network.validateSession(boxData.serialCode):
         print("> ERROR: BOX IS NOT VALID!!!")
         # ws.deleteBoxData()
-        exit(-1)
+        # exit(-1)
     else:
         print("> Box is valid!")
     
