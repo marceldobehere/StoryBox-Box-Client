@@ -163,8 +163,8 @@ def handleAudioCommand(command, arg):
     elif command == "STOP":
         audio.cmdStop()
     elif command == "SKIP_TIME":
-        if arg is not None:
-            audio.cmdSkipTime(arg)
+        if arg is not None and "TIME" in arg:
+            audio.cmdSkipTime(arg["TIME"])
         else:
             raise Exception("NO SKIP TIME PROVIDED")
 

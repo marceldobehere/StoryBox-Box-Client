@@ -118,8 +118,9 @@ def tryPlayFile(path, updateFunc):
             break
 
         if btn.getBtn(0):
-            # print('  > Force Stop')
-            # break
+            # temp
+            print('  > Force Stop')
+            break
 
             if player.is_playing():
                 player.pause()
