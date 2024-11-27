@@ -105,3 +105,7 @@ def threadWaitLoop():
 def startSyncLoop():
     thread = threading.Timer(5.0, threadWaitLoop)
     thread.start()
+
+def singleForceSync():
+    thread = threading.Timer(1.0, syncThreadFunc)
+    thread.start()

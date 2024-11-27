@@ -8,6 +8,7 @@ import src.files as files
 from websockets.sync.client import connect
 import src.boxData as boxData
 import src.audio as audio
+import src.syncStuff as sync
 
 wsServerPath = "wss://storybox-server-box-157863384612.us-central1.run.app/ws/connect"
 
@@ -81,6 +82,11 @@ def handleServerMsg(obj):
         print(f"> DELETE BOX SENT!!!")
         sendData("delete_box", {})
         deleteBoxData()
+
+    if obj["type"] == "force_sync":
+        print(f"> Force Sync")
+        sync.singleForceSync()
+        sendData("force_sync", {})
     
     if obj["type"] == "audio_command":
         print("> Audio Command")
@@ -198,6 +204,9 @@ def boxDeleteTest():
 def boxCmdTest():
     handleServerMsg({"type": "audio_command", "data": {"command":"SET_TIME", "arg": {"TIME": 20000}}, "error": False})
 
+def boxForceSyncTest():
+    handleServerMsg({"type": "force_sync", "data": {}, "error": False})
+
 if False:
     thread = threading.Timer(5.0, boxDeleteTest)
     thread.start() 
@@ -205,6 +214,10 @@ if False:
 
 if False:
     thread = threading.Timer(15.0, boxCmdTest)
+    thread.start() 
+
+if False:
+    thread = threading.Timer(25.0, boxForceSyncTest)
     thread.start() 
 
 
