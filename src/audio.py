@@ -76,7 +76,7 @@ def getAllFilesNeeded():
 
 AUDIO_COMMAND = None
 AUDIO_COMMAND_ARG = None
-# COMMANDS ["PAUSE", "RESUME", "STOP", "SKIP_TIME"]
+# COMMANDS ["PAUSE", "RESUME", "STOP", "SKIP_TIME", "SET_TIME"]
 
 def cmdPause():
     global AUDIO_COMMAND, AUDIO_COMMAND_ARG
@@ -94,6 +94,10 @@ def cmdSkipTime(amt):
     global AUDIO_COMMAND, AUDIO_COMMAND_ARG
     AUDIO_COMMAND_ARG = amt
     AUDIO_COMMAND = "SKIP_TIME"
+def cmdSetTime(amt):
+    global AUDIO_COMMAND, AUDIO_COMMAND_ARG
+    AUDIO_COMMAND_ARG = amt
+    AUDIO_COMMAND = "SET_TIME" 
 
 
 def checkTag():
@@ -164,6 +168,12 @@ def tryPlayFile(path, updateFunc):
                 elif AUDIO_COMMAND == "SKIP_TIME":
                     length = max(1, player.get_length())
                     newPercent = (player.get_time() + AUDIO_COMMAND_ARG) / length
+                    newPercent = min(newPercent, 1)
+                    newPercent = max(newPercent, 0)
+                    player.set_position(newPercent)
+                elif AUDIO_COMMAND == "SET_TIME":
+                    length = max(1, player.get_length())
+                    newPercent = AUDIO_COMMAND_ARG / length
                     newPercent = min(newPercent, 1)
                     newPercent = max(newPercent, 0)
                     player.set_position(newPercent)

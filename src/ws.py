@@ -20,6 +20,7 @@ def initWs():
 websocketConn = None
 
 def sendWsObj(obj):
+    print("> Sending: ", obj)
     global websocketConn
     if websocketConn == None:
         return False
@@ -83,6 +84,7 @@ def handleServerMsg(obj):
                 arg = data["arg"]
             sendData("audio_command", handleAudioCommand(data["command"], arg))
         except Exception as error:
+            print("> Error while handling Audio Command: ", error)
             sendWsObj({"type": "audio_command", "error": True, "data": str(error)})
 
 
@@ -111,7 +113,6 @@ def sendData(type, data):
         "data": data,
         "error": False
     }
-    print("> Sending: ", obj)
     sendWsObj(obj)
 
 
@@ -168,6 +169,11 @@ def handleAudioCommand(command, arg):
             audio.cmdSkipTime(arg["TIME"])
         else:
             raise Exception("NO SKIP TIME PROVIDED")
+    elif command == "SET_TIME":
+        if arg is not None and "TIME" in arg:
+            audio.cmdSetTime(arg["TIME"])
+        else:
+            raise Exception("NO SET TIME PROVIDED")
 
     return {}
 
@@ -183,7 +189,7 @@ def boxDeleteTest():
     handleServerMsg({"type": "delete_box", "data": {}, "error": False})
 
 def boxCmdTest():
-    handleServerMsg({"type": "audio_command", "data": {"command":"SKIP_TIME", "arg": 20000}, "error": False})
+    handleServerMsg({"type": "audio_command", "data": {"command":"SET_TIME", "arg": {"TIME": 20000}}, "error": False})
 
 if False:
     thread = threading.Timer(5.0, boxDeleteTest)
