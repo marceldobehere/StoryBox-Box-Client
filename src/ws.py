@@ -22,10 +22,17 @@ websocketConn = None
 def sendWsObj(obj):
     print("> Sending: ", obj)
     global websocketConn
-    if websocketConn == None:
-        return False
-    websocketConn.send(json.dumps(obj))
-    return True
+    for i in range(8):
+        if websocketConn is not None:
+            try:
+                websocketConn.send(json.dumps(obj))
+                return True
+            except:
+                pass
+        print(" > Trying to Resend...")
+        sleep(0.4)
+    print("> ERROR: Failed to send: ", obj)
+    return False
 
 def wsLoop():
     global websocketConn
