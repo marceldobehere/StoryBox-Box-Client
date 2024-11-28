@@ -228,7 +228,7 @@ if False:
     thread = threading.Timer(25.0, boxForceSyncTest)
     thread.start() 
 
-if True:
+if False:
     thread = threading.Timer(15.0, boxCmdTest2)
     thread.start() 
 
