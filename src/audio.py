@@ -76,7 +76,7 @@ def getAllFilesNeeded():
 
 AUDIO_COMMAND = None
 AUDIO_COMMAND_ARG = None
-# COMMANDS ["PAUSE", "RESUME", "STOP", "SKIP_TIME", "SET_TIME"]
+# COMMANDS ["PAUSE", "RESUME", "STOP", "SKIP_TIME", "SET_TIME", "NEXT_SONG", "PREVIOUS_SONG"]
 
 def cmdPause():
     global AUDIO_COMMAND, AUDIO_COMMAND_ARG
@@ -97,7 +97,15 @@ def cmdSkipTime(amt):
 def cmdSetTime(amt):
     global AUDIO_COMMAND, AUDIO_COMMAND_ARG
     AUDIO_COMMAND_ARG = amt
-    AUDIO_COMMAND = "SET_TIME" 
+    AUDIO_COMMAND = "SET_TIME"
+def cmdPreviousSong():
+    global AUDIO_COMMAND, AUDIO_COMMAND_ARG
+    AUDIO_COMMAND_ARG = None
+    AUDIO_COMMAND = "PREVIOUS_SONG"
+def cmdNextSong():
+    global AUDIO_COMMAND, AUDIO_COMMAND_ARG
+    AUDIO_COMMAND_ARG = None
+    AUDIO_COMMAND = "NEXT_SONG"
 
 
 def checkTag():
@@ -123,6 +131,7 @@ def tryPlayFile(path, updateFunc):
     Ended = 6
     updateFreq = 2000 # 2 seconds
     lastTime = player.get_time() // updateFreq
+    lastPauseTime = time()
     lastPaused = False
     AUDIO_COMMAND = None
     TAG_RESET = time() + 0.5
@@ -156,9 +165,21 @@ def tryPlayFile(path, updateFunc):
 
                 # cmdSkipTime(-2*1000)
                 sleep(0.2)
+            
+            if not player.is_playing():
+                if time() > lastPauseTime + 2*60:
+                    print("> PAUSED TOO LONG!!!")
+                    break
+            else:
+                lastPauseTime = time()
 
             if AUDIO_COMMAND is not None:
                 print("> Doing Audio Command: ", AUDIO_COMMAND, ", Arg: ", AUDIO_COMMAND_ARG)
+
+                if AUDIO_COMMAND == "PREVIOUS_SONG" and player.get_time() > 6000:
+                    AUDIO_COMMAND = "SET_TIME"
+                    AUDIO_COMMAND_ARG = 0
+
                 if AUDIO_COMMAND == "PAUSE":
                     player.pause()
                 elif AUDIO_COMMAND == "RESUME":
@@ -177,6 +198,10 @@ def tryPlayFile(path, updateFunc):
                     newPercent = min(newPercent, 1)
                     newPercent = max(newPercent, 0)
                     player.set_position(newPercent)
+                elif AUDIO_COMMAND == "NEXT_SONG":
+                    break
+                elif AUDIO_COMMAND == "PREVIOUS_SONG":
+                    break
                 else:
                     print("> Unknown Command: ", AUDIO_COMMAND)
                 
@@ -225,7 +250,7 @@ def findPlaylist(playlist_id):
     return None
 
 
-def pickNextSong(playlist, playlist_id):
+def pickNextSong(playlist, playlist_id, forceNext):
     global playlistLastSongMap
     id = str(playlist_id)
 
@@ -238,10 +263,10 @@ def pickNextSong(playlist, playlist_id):
         print("> ERR: PLAYLIST HAS NO AUDIOS: ", playlist)
         return None
 
-    if playlist["mode"] == "random":
+    if playlist["mode"] == "random" and not forceNext:
         next_audio_id = secure_random.choice(audioIds)
 
-    elif playlist["mode"] == "sequential":
+    elif playlist["mode"] == "sequential" or forceNext:
         last_song = None
         last_song_id = None
         id = str(playlist_id)
@@ -265,6 +290,37 @@ def pickNextSong(playlist, playlist_id):
 
     return next_audio_id
 
+def pickPreviousSong(playlist, playlist_id):
+    global playlistLastSongMap
+    id = str(playlist_id)
+
+    print(f"> Picking previous song for playlist: {id}")
+    print(playlist)
+    next_audio_id = None
+    audioIds = playlist["audioFiles"]
+
+    if len(audioIds) == 0:
+        print("> ERR: PLAYLIST HAS NO AUDIOS: ", playlist)
+        return None
+
+    last_song = None
+    last_song_id = None
+    id = str(playlist_id)
+    if id in playlistLastSongMap:
+        last_song = playlistLastSongMap[id]
+        last_song_id = last_song["audio_id"]
+        if not last_song_id in audioIds:
+            last_song_id = None
+    print(f" > Last Song: ", last_song)
+
+    if last_song_id == None:
+        return audioIds[0]
+    else:
+        audioIndex = audioIds.index(last_song_id)
+        audioIndex -= 1
+        if audioIndex >= 0:
+            return audioIds[audioIndex]
+        return audioIds[0]
 
 def updateTimestamp(toyId, audioId, timeMs, paused):
     print(f"> New Timestamp: {timeMs}ms, (Paused: {paused}, Toy: {toyId}, Audio: {audioId})")
@@ -284,14 +340,32 @@ def tryPlayPlaylist(playlistId):
         sleep(0.5)
         return
     print(playlist)
-    audioFileId = pickNextSong(playlist, playlistId)
+    audioFileId = pickNextSong(playlist, playlistId, False)
+    tryPlayPlaylist2(audioFileId, playlist, playlistId)
+
+def tryPlayPlaylist2(audioFileId, playlist, playlistId):
     audioFile = getFileNameFromId(audioFileId, None)
     print(" > Picked: ", audioFile)
 
     ws.boxStatus("PLAYING", playlistId, audioFileId, 0)
     saveCurrentPlayingSong(playlistId, audioFileId)
-    tryPlayFile(audioFile, updateTimestampFunc(playlistId, audioFileId))
+    try:
+        tryPlayFile(audioFile, updateTimestampFunc(playlistId, audioFileId))
+    except Exception as error:
+        print("> ERROR WHILE TRYING PLAY FILE: ", error)
     ws.boxStatus("IDLE", None, None, None)
+
+    global AUDIO_COMMAND
+    if AUDIO_COMMAND == "NEXT_SONG":
+        print("> NEXT SONG")
+        AUDIO_COMMAND = None
+        audioFileId = pickNextSong(playlist, playlistId, True)
+        tryPlayPlaylist2(audioFileId, playlist, playlistId)
+    elif AUDIO_COMMAND == "PREVIOUS_SONG":
+        print("> PREVIOUS SONG")
+        AUDIO_COMMAND = None
+        audioFileId = pickPreviousSong(playlist, playlistId)
+        tryPlayPlaylist2(audioFileId, playlist, playlistId)
 
 
 def initPlaylistData():

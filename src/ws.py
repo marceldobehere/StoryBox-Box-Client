@@ -187,6 +187,11 @@ def handleAudioCommand(command, arg):
             audio.cmdSetTime(arg["TIME"])
         else:
             raise Exception("NO SET TIME PROVIDED")
+    elif command == "NEXT_SONG":
+        audio.cmdNextSong()
+    elif command == "PREVIOUS_SONG":
+        audio.cmdPreviousSong()
+        
 
     return {}
 
@@ -204,6 +209,9 @@ def boxDeleteTest():
 def boxCmdTest():
     handleServerMsg({"type": "audio_command", "data": {"command":"SET_TIME", "arg": {"TIME": 20000}}, "error": False})
 
+def boxCmdTest2():
+    handleServerMsg({"type": "audio_command", "data": {"command":"PREVIOUS_SONG"}, "error": False})
+
 def boxForceSyncTest():
     handleServerMsg({"type": "force_sync", "data": {}, "error": False})
 
@@ -218,6 +226,10 @@ if False:
 
 if False:
     thread = threading.Timer(25.0, boxForceSyncTest)
+    thread.start() 
+
+if True:
+    thread = threading.Timer(15.0, boxCmdTest2)
     thread.start() 
 
 
