@@ -192,14 +192,14 @@ def tryPlayFile(path, updateFunc):
                     newPercent = min(newPercent, 1)
                     newPercent = max(newPercent, 0)
                     player.set_position(newPercent)
-                    lastTime = player.get_time() // updateFreq
+                    lastTime = (player.get_time() - 5000) // updateFreq
                 elif AUDIO_COMMAND == "SET_TIME":
                     length = max(1, player.get_length())
                     newPercent = AUDIO_COMMAND_ARG / length
                     newPercent = min(newPercent, 1)
                     newPercent = max(newPercent, 0)
                     player.set_position(newPercent)
-                    lastTime = player.get_time() // updateFreq
+                    lastTime = (player.get_time() - 5000) // updateFreq
                 elif AUDIO_COMMAND == "NEXT_SONG":
                     break
                 elif AUDIO_COMMAND == "PREVIOUS_SONG":
