@@ -3,7 +3,7 @@ import json
 import os
 from subprocess import call
 import threading
-from time import sleep
+from time import sleep, time
 import src.files as files
 from websockets.sync.client import connect
 import src.boxData as boxData
@@ -157,7 +157,8 @@ def boxStatus(status, currentToyId, currentAudioId, timestampMs):
         "status": status, 
         "current-toy-id":currentToyId, 
         "current-audio-id": currentAudioId,
-        "current-audio-time": timestampMs
+        "current-audio-time": timestampMs,
+        "utc-time": round(time()*1000)
     })
 
 

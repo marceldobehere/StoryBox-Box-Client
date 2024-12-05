@@ -129,7 +129,7 @@ def tryPlayFile(path, updateFunc):
     
     print('  > Wait')
     Ended = 6
-    updateFreq = 2000 # 2 seconds
+    updateFreq = 2500 # 2.5 seconds
     lastTime = player.get_time() // updateFreq
     lastPauseTime = time()
     lastPaused = False
@@ -192,14 +192,14 @@ def tryPlayFile(path, updateFunc):
                     newPercent = min(newPercent, 1)
                     newPercent = max(newPercent, 0)
                     player.set_position(newPercent)
-                    lastTime = (player.get_time() - 5000) // updateFreq
+                    lastTime = (player.get_time() + updateFreq + (updateFreq - 500)) // updateFreq
                 elif AUDIO_COMMAND == "SET_TIME":
                     length = max(1, player.get_length())
                     newPercent = AUDIO_COMMAND_ARG / length
                     newPercent = min(newPercent, 1)
                     newPercent = max(newPercent, 0)
                     player.set_position(newPercent)
-                    lastTime = (player.get_time() - 5000) // updateFreq
+                    lastTime = (player.get_time() + updateFreq + (updateFreq - 500)) // updateFreq
                 elif AUDIO_COMMAND == "NEXT_SONG":
                     break
                 elif AUDIO_COMMAND == "PREVIOUS_SONG":
@@ -355,9 +355,12 @@ def tryPlayPlaylist2(audioFileId, playlist, playlistId):
         tryPlayFile(audioFile, updateTimestampFunc(playlistId, audioFileId))
     except Exception as error:
         print("> ERROR WHILE TRYING PLAY FILE: ", error)
-    ws.boxStatus("IDLE", None, None, None)
-
+    
     global AUDIO_COMMAND
+    if AUDIO_COMMAND != "NEXT_SONG" and AUDIO_COMMAND != "PREVIOUS_SONG":
+        ws.boxStatus("IDLE", None, None, None)
+
+    
     if AUDIO_COMMAND == "NEXT_SONG":
         print("> NEXT SONG")
         AUDIO_COMMAND = None
