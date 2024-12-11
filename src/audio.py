@@ -62,7 +62,10 @@ def getDownloadedFiles():
     print(downloaded)
     res = []
     for filename in downloaded:
-        res.append(str(filename.replace("DOWNLOAD_", "").replace("_.", ".").split(".")[0]))
+        # print(" > HASH: ", files.getMd5Hash("./audios/" + filename))
+        hash = files.getMd5Hash("./audios/" + filename)
+        id = str(filename.replace("DOWNLOAD_", "").replace("_.", ".").split(".")[0])
+        res.append({"hash":hash, "id":id})
     return res
 
 def getAllFilesNeeded():
@@ -129,7 +132,7 @@ def tryPlayFile(path, updateFunc):
     
     print('  > Wait')
     Ended = 6
-    updateFreq = 2500 # 2.5 seconds
+    updateFreq = 5000 # 2.5 seconds
     lastTime = player.get_time() // updateFreq
     lastPauseTime = time()
     lastPaused = False

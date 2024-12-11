@@ -15,6 +15,7 @@ def convPlaylist(playlistObj):
         resObj["name"] = temp["name"]
         resObj["mode"] = temp["mode"]
         resObj["audioFiles"] = temp["audio"]
+        resObj["hashes"] = temp["hashes"]
         res.append(resObj)
 
     return res
@@ -48,18 +49,21 @@ def performSync():
         updatePlaylist()
 
         downloaded = audio.getDownloadedFiles()
-        needed = audio.getAllFilesNeeded()
-
         print(" > Downloaded: ", downloaded)
+
+        downloadedIds = list(map(lambda obj: obj["id"], downloaded))
+        print(" > Downloaded Ids: ", downloadedIds)
+        
+        needed = audio.getAllFilesNeeded()
         print(" > Needed: ", needed)
 
         needToDownload = []
         for file in needed:
-            if not file in downloaded:
+            if not file in downloadedIds:
                 needToDownload.append(file)
 
         needToDelete = []
-        for file in downloaded:
+        for file in downloadedIds:
             if not file in needed:
                 needToDelete.append(file)
 
