@@ -50,5 +50,5 @@ def getMd5Hash(filename):
         for buf in iter(partial(f.read, 128), b''):
             d.update(buf)
     hexdigest = d.hexdigest()
-    b64 = codecs.encode(codecs.decode(hexdigest, 'hex'), 'base64').decode()
+    b64 = codecs.encode(codecs.decode(hexdigest, 'hex'), 'base64').decode().replace('\n', '')
     return b64

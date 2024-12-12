@@ -13,7 +13,12 @@ def convPlaylist(playlistObj):
         resObj = {}
         resObj["id"] = int(id)
         resObj["name"] = temp["name"]
-        resObj["mode"] = temp["mode"]
+        resObj["mode"] = temp["random"]
+
+        # TODO: FIX 
+        if temp["random"] == "":
+            resObj["mode"] = "sequential"
+        
         resObj["audioFiles"] = temp["audio"]
         resObj["hashes"] = temp["hashes"]
         res.append(resObj)
@@ -42,6 +47,38 @@ def updatePlaylist():
     except Exception as error:
         print("  > Error during download: ", error) 
 
+def getIdsAndHashesFromPlaylist(playlist):
+    print("> Getting Hashes and Ids from remote")
+    songsAndIds = []
+    for key in playlist:
+        # print(" > BLUB: ", key)
+        for i in range(len(key["audioFiles"])):
+            # print("  > BLUB: ", key["audioFiles"][i], " - ", key["hashes"][i])
+            songsAndIds.append({"id": key["audioFiles"][i], "hash": key["hashes"][i]})
+    return songsAndIds
+
+def compareIdsAndHashes(downloaded, remote):
+    remoteIds = list(map(lambda obj: str(obj["id"]), remote))
+    remoteHashes = list(map(lambda obj: obj["hash"], remote))
+
+    res = []
+
+    for entry in downloaded:
+        # print(" > ", entry)
+        if entry["id"] in remoteIds:
+            idx = remoteIds.index(entry["id"])
+            if entry["hash"] != remoteHashes[idx]:
+                print(" > HASH MISMATCH!!! ", entry["hash"], remoteHashes[idx])
+                continue
+            else:
+                # print(" > HASH MATCH!!! ", entry["hash"], remoteHashes[idx])
+                pass
+        else:
+            print(" > ENTRY NOT FOUND!!! ", entry["id"], remoteIds)
+        res.append(entry)
+
+    return res
+
 def performSync():
     try:
         print("> Performing Sync")
@@ -49,7 +86,12 @@ def performSync():
         updatePlaylist()
 
         downloaded = audio.getDownloadedFiles()
-        print(" > Downloaded: ", downloaded)
+        # print(" > Downloaded: ", downloaded)
+
+        remotePlaylistStuff = getIdsAndHashesFromPlaylist(audio.playlistMap)
+        # print("> Remote Playlist: ", remotePlaylistStuff)
+
+        downloaded = compareIdsAndHashes(downloaded, remotePlaylistStuff)
 
         downloadedIds = list(map(lambda obj: obj["id"], downloaded))
         print(" > Downloaded Ids: ", downloadedIds)

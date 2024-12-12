@@ -290,7 +290,7 @@ def pickNextSong(playlist, playlist_id, forceNext):
             return audioIds[audioIndex]
 
     else:
-        print("> ERR: UNKOWN PLAYLIST MODE: ", playlist["mode"])
+        print("> ERR: UNKNOWN PLAYLIST MODE: ", playlist["mode"])
         return None
 
     return next_audio_id
