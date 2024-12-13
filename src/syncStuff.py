@@ -13,12 +13,18 @@ def convPlaylist(playlistObj):
         resObj = {}
         resObj["id"] = int(id)
         resObj["name"] = temp["name"]
-        resObj["mode"] = temp["random"]
 
-        # TODO: FIX 
+        resObj["mode"] = temp["random"]
+        # TODO: FIX or be confused???
         if temp["random"] == "":
             resObj["mode"] = "sequential"
         
+        # TODO: Get from Playlist response once it exists
+        autoplay = False
+        resObj["autoplay"] = autoplay
+        if autoplay:
+            resObj["mode"] = "sequential"
+
         resObj["audioFiles"] = temp["audio"]
         resObj["hashes"] = temp["hashes"]
         res.append(resObj)
@@ -67,7 +73,9 @@ def compareIdsAndHashes(downloaded, remote):
         # print(" > ", entry)
         if entry["id"] in remoteIds:
             idx = remoteIds.index(entry["id"])
-            if entry["hash"] != remoteHashes[idx]:
+            if remoteHashes[idx] is None:
+                print(" > REMOTE HASH IS NONE!!! ", entry["hash"], remoteHashes[idx])
+            elif entry["hash"] != remoteHashes[idx]:
                 print(" > HASH MISMATCH!!! ", entry["hash"], remoteHashes[idx])
                 continue
             else:

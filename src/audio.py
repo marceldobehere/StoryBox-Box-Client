@@ -358,6 +358,8 @@ def tryPlayPlaylist2(audioFileId, playlist, playlistId):
         tryPlayFile(audioFile, updateTimestampFunc(playlistId, audioFileId))
     except Exception as error:
         print("> ERROR WHILE TRYING PLAY FILE: ", error)
+
+    # check for playlist.autoplay
     
     global AUDIO_COMMAND
     if AUDIO_COMMAND != "NEXT_SONG" and AUDIO_COMMAND != "PREVIOUS_SONG":
