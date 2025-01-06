@@ -1,5 +1,5 @@
 # StoryBox-Box-Client
-Box Client for StoryBox
+Box Client for StoryBox for the Raspberry PI
 
 
 ## Notes
