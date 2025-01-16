@@ -172,7 +172,9 @@ def tryPlayFile(path, updateFunc):
             if not player.is_playing():
                 if time() > lastPauseTime + 2*60:
                     print("> PAUSED TOO LONG!!!")
-                    break
+                    lastPauseTime = time()
+                    # AUDIO_COMMAND = "STOP"
+                    # break
             else:
                 lastPauseTime = time()
 
@@ -220,6 +222,7 @@ def tryPlayFile(path, updateFunc):
                         TAG_RESET = time() + 1
                     else:
                         print("> NEW NFC TAG BWAAAA")
+                        AUDIO_COMMAND = "STOP"
                         break
 
             if updateFunc is not None:
@@ -271,7 +274,7 @@ def pickNextSong(playlist, playlist_id, forceNext):
     if playlist["mode"] == "random" and not forceNext:
         next_audio_id = secure_random.choice(audioIds)
 
-    elif playlist["mode"] == "sequential" or forceNext:
+    elif playlist["mode"] == "sequential" or forceNext or playlist["autoplay"]:
         last_song = None
         last_song_id = None
         id = str(playlist_id)
@@ -371,11 +374,27 @@ def tryPlayPlaylist2(audioFileId, playlist, playlistId):
         AUDIO_COMMAND = None
         audioFileId = pickNextSong(playlist, playlistId, True)
         tryPlayPlaylist2(audioFileId, playlist, playlistId)
+        return
     elif AUDIO_COMMAND == "PREVIOUS_SONG":
         print("> PREVIOUS SONG")
         AUDIO_COMMAND = None
         audioFileId = pickPreviousSong(playlist, playlistId)
         tryPlayPlaylist2(audioFileId, playlist, playlistId)
+        return
+    elif AUDIO_COMMAND == "STOP":
+        print("> STOP")
+        AUDIO_COMMAND = None
+        return
+
+    if playlist["autoplay"]:
+        print("> NEXT SONG AUTOPLAY")
+        AUDIO_COMMAND = None
+        if audioFileId == playlist["audioFiles"][-1]:
+            print("> NEXT SONG AUTOPLAY DONE")
+            return
+        audioFileId = pickNextSong(playlist, playlistId, True)
+        tryPlayPlaylist2(audioFileId, playlist, playlistId)
+        return
 
 
 def initPlaylistData():

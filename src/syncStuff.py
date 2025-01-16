@@ -19,8 +19,7 @@ def convPlaylist(playlistObj):
         if temp["random"] == "":
             resObj["mode"] = "sequential"
         
-        # TODO: Get from Playlist response once it exists
-        autoplay = False
+        autoplay = temp["autoplay"]
         resObj["autoplay"] = autoplay
         if autoplay:
             resObj["mode"] = "sequential"
