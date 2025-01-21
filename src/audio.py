@@ -77,38 +77,48 @@ def getAllFilesNeeded():
 
     return res
 
-AUDIO_COMMAND = None
-AUDIO_COMMAND_ARG = None
+AUDIO_COMMAND = []
+AUDIO_COMMAND_ARG = []
 # COMMANDS ["PAUSE", "RESUME", "STOP", "SKIP_TIME", "SET_TIME", "NEXT_SONG", "PREVIOUS_SONG"]
 
 def cmdPause():
     global AUDIO_COMMAND, AUDIO_COMMAND_ARG
-    AUDIO_COMMAND_ARG = None
-    AUDIO_COMMAND = "PAUSE"
+    AUDIO_COMMAND_ARG.append(None)
+    AUDIO_COMMAND.append("PAUSE")
 def cmdResume():
     global AUDIO_COMMAND, AUDIO_COMMAND_ARG
-    AUDIO_COMMAND_ARG = None
-    AUDIO_COMMAND = "RESUME"
+    AUDIO_COMMAND_ARG.append(None)
+    AUDIO_COMMAND.append("RESUME")
 def cmdStop():
     global AUDIO_COMMAND, AUDIO_COMMAND_ARG
-    AUDIO_COMMAND_ARG = None
-    AUDIO_COMMAND = "STOP"
+    AUDIO_COMMAND_ARG.append(None)
+    AUDIO_COMMAND.append("STOP")
 def cmdSkipTime(amt):
     global AUDIO_COMMAND, AUDIO_COMMAND_ARG
-    AUDIO_COMMAND_ARG = amt
-    AUDIO_COMMAND = "SKIP_TIME"
+    AUDIO_COMMAND_ARG.append(amt)
+    AUDIO_COMMAND.append("SKIP_TIME")
 def cmdSetTime(amt):
     global AUDIO_COMMAND, AUDIO_COMMAND_ARG
-    AUDIO_COMMAND_ARG = amt
-    AUDIO_COMMAND = "SET_TIME"
+    AUDIO_COMMAND_ARG.append(amt)
+    AUDIO_COMMAND.append("SET_TIME")
 def cmdPreviousSong():
     global AUDIO_COMMAND, AUDIO_COMMAND_ARG
-    AUDIO_COMMAND_ARG = None
-    AUDIO_COMMAND = "PREVIOUS_SONG"
+    AUDIO_COMMAND_ARG.append(None)
+    AUDIO_COMMAND.append("PREVIOUS_SONG")
 def cmdNextSong():
     global AUDIO_COMMAND, AUDIO_COMMAND_ARG
-    AUDIO_COMMAND_ARG = None
-    AUDIO_COMMAND = "NEXT_SONG"
+    AUDIO_COMMAND_ARG.append(None)
+    AUDIO_COMMAND.append("NEXT_SONG")
+
+def hasCmd():
+    if len(AUDIO_COMMAND) > 0:
+        print("Has CMD: ", len(AUDIO_COMMAND))
+    return len(AUDIO_COMMAND) > 0
+
+def getCmd():
+    cmd, arg = AUDIO_COMMAND.pop(0), AUDIO_COMMAND_ARG.pop(0)
+    print("GET CMD: ", AUDIO_COMMAND, cmd, arg)
+    return cmd, arg
 
 
 def checkTag():
@@ -117,7 +127,6 @@ def checkTag():
     return (READER_REF.read_id_no_block() is not None)
 
 def tryPlayFile(path, updateFunc):
-    global AUDIO_COMMAND, AUDIO_COMMAND_ARG
     if path == "" or not files.fileExists(path):
         print(' > Unkown Path! ', path)
         sleep(1)
@@ -136,7 +145,7 @@ def tryPlayFile(path, updateFunc):
     lastTime = player.get_time() // updateFreq
     lastPauseTime = time()
     lastPaused = False
-    AUDIO_COMMAND = None
+
     TAG_RESET = time() + 0.5
     
     try:
@@ -173,47 +182,50 @@ def tryPlayFile(path, updateFunc):
                 if time() > lastPauseTime + 2*60:
                     print("> PAUSED TOO LONG!!!")
                     lastPauseTime = time()
-                    # AUDIO_COMMAND = "STOP"
                     # break
             else:
                 lastPauseTime = time()
 
-            if AUDIO_COMMAND is not None:
-                print("> Doing Audio Command: ", AUDIO_COMMAND, ", Arg: ", AUDIO_COMMAND_ARG)
+            if hasCmd():
+                A_CMD, A_ARG = getCmd()
+                print("> Doing Audio Command: ", A_CMD, ", Arg: ", A_ARG)
 
-                if AUDIO_COMMAND == "PREVIOUS_SONG" and player.get_time() > 6000:
-                    AUDIO_COMMAND = "SET_TIME"
-                    AUDIO_COMMAND_ARG = 0
+                if A_CMD == "PREVIOUS_SONG" and player.get_time() > 6000:
+                    A_CMD = "SET_TIME"
+                    A_ARG = 0
 
-                if AUDIO_COMMAND == "PAUSE":
+                if A_CMD == "PAUSE":
                     player.pause()
-                elif AUDIO_COMMAND == "RESUME":
+                elif A_CMD == "RESUME":
                     player.play()
-                elif AUDIO_COMMAND == "STOP":
+                elif A_CMD == "STOP":
+                    cmdStop()
                     break
-                elif AUDIO_COMMAND == "SKIP_TIME":
+                elif A_CMD == "SKIP_TIME":
                     length = max(1, player.get_length())
-                    newPercent = (player.get_time() + AUDIO_COMMAND_ARG) / length
+                    newPercent = (player.get_time() + A_ARG) / length
                     newPercent = min(newPercent, 1)
                     newPercent = max(newPercent, 0)
                     player.set_position(newPercent)
                     lastTime = (player.get_time() + updateFreq + (updateFreq - 500)) // updateFreq
-                elif AUDIO_COMMAND == "SET_TIME":
+                elif A_CMD == "SET_TIME":
                     length = max(1, player.get_length())
-                    newPercent = AUDIO_COMMAND_ARG / length
+                    newPercent = A_ARG / length
                     newPercent = min(newPercent, 1)
                     newPercent = max(newPercent, 0)
                     player.set_position(newPercent)
                     lastTime = (player.get_time() + updateFreq + (updateFreq - 500)) // updateFreq
-                elif AUDIO_COMMAND == "NEXT_SONG":
+                elif A_CMD == "NEXT_SONG":
+                    cmdNextSong()
                     break
-                elif AUDIO_COMMAND == "PREVIOUS_SONG":
+                elif A_CMD == "PREVIOUS_SONG":
+                    cmdPreviousSong()
                     break
                 else:
-                    print("> Unknown Command: ", AUDIO_COMMAND)
+                    print("> Unknown Command: ", A_CMD)
                 
-                AUDIO_COMMAND = None
-                AUDIO_COMMAND_ARG = None
+                A_CMD = None
+                A_ARG = None
 
             if READER_REF is not None:
                 TAG_HERE_NOW = checkTag()
@@ -222,7 +234,7 @@ def tryPlayFile(path, updateFunc):
                         TAG_RESET = time() + 1
                     else:
                         print("> NEW NFC TAG BWAAAA")
-                        AUDIO_COMMAND = "STOP"
+                        A_CMD = "STOP"
                         break
 
             if updateFunc is not None:
@@ -364,37 +376,37 @@ def tryPlayPlaylist2(audioFileId, playlist, playlistId):
 
     # check for playlist.autoplay
     
-    global AUDIO_COMMAND
-    if AUDIO_COMMAND != "NEXT_SONG" and AUDIO_COMMAND != "PREVIOUS_SONG":
-        ws.boxStatus("IDLE", None, None, None)
+    doIdle = True
+    while hasCmd():
+        A_CMD, A_ARG = getCmd()
 
-    
-    if AUDIO_COMMAND == "NEXT_SONG":
-        print("> NEXT SONG")
-        AUDIO_COMMAND = None
-        audioFileId = pickNextSong(playlist, playlistId, True)
-        tryPlayPlaylist2(audioFileId, playlist, playlistId)
-        return
-    elif AUDIO_COMMAND == "PREVIOUS_SONG":
-        print("> PREVIOUS SONG")
-        AUDIO_COMMAND = None
-        audioFileId = pickPreviousSong(playlist, playlistId)
-        tryPlayPlaylist2(audioFileId, playlist, playlistId)
-        return
-    elif AUDIO_COMMAND == "STOP":
-        print("> STOP")
-        AUDIO_COMMAND = None
-        return
-
-    if playlist["autoplay"]:
-        print("> NEXT SONG AUTOPLAY")
-        AUDIO_COMMAND = None
-        if audioFileId == playlist["audioFiles"][-1]:
-            print("> NEXT SONG AUTOPLAY DONE")
+        if A_CMD == "NEXT_SONG":
+            print("> NEXT SONG")
+            doIdle = False
+            audioFileId = pickNextSong(playlist, playlistId, True)
+            tryPlayPlaylist2(audioFileId, playlist, playlistId)
             return
-        audioFileId = pickNextSong(playlist, playlistId, True)
-        tryPlayPlaylist2(audioFileId, playlist, playlistId)
-        return
+        elif A_CMD == "PREVIOUS_SONG":
+            print("> PREVIOUS SONG")
+            doIdle = False
+            audioFileId = pickPreviousSong(playlist, playlistId)
+            tryPlayPlaylist2(audioFileId, playlist, playlistId)
+            return
+        elif A_CMD == "STOP":
+            print("> STOP")
+            return
+
+        if playlist["autoplay"]:
+            print("> NEXT SONG AUTOPLAY")
+            if audioFileId == playlist["audioFiles"][-1]:
+                print("> NEXT SONG AUTOPLAY DONE")
+                return
+            audioFileId = pickNextSong(playlist, playlistId, True)
+            tryPlayPlaylist2(audioFileId, playlist, playlistId)
+            return
+
+    if doIdle:
+        ws.boxStatus("IDLE", None, None, None)
 
 
 def initPlaylistData():
