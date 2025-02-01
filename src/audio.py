@@ -179,10 +179,10 @@ def tryPlayFile(path, updateFunc):
                 sleep(0.2)
             
             if not player.is_playing():
-                if time() > lastPauseTime + 2*60:
+                if time() > lastPauseTime + 3*60:
                     print("> PAUSED TOO LONG!!!")
                     lastPauseTime = time()
-                    # break
+                    break
             else:
                 lastPauseTime = time()
 
