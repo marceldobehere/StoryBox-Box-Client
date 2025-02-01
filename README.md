@@ -9,6 +9,26 @@ Before you can use it:
 * Run `./initEnv.sh`
 * Restart the device
 
+## Bluetooth stuff
+https://forums.raspberrypi.com/viewtopic.php?t=133263
+
+
+https://forums.raspberrypi.com/viewtopic.php?t=329762
+https://bbs.archlinux.org/viewtopic.php?id=270465
+
+`sudo apt-get install python3-dbus bluez-tools`
+
+-> The stuff below
+TODO: Improve docs and test
+
+`sudo apt install pipewire-audio-client-libraries libspa-0.2-bluetooth`
+
+https://forums.raspberrypi.com/viewtopic.php?p=955425#p955425
+
+https://forums.raspberrypi.com/viewtopic.php?t=78838
+
+https://forums.raspberrypi.com/viewtopic.php?t=135582
+
 ## Running it
 To run it, use the `./start.sh` file.
 
