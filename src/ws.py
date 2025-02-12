@@ -42,8 +42,10 @@ def wsLoop():
             print("> WS (RE)CONNECT: ")
             with connect(wsServerPath) as websocket:
                 websocketConn = websocket
-
                 authBox(boxData.serialCode)
+                websocketConn = None
+                sleep(0.5)
+                websocketConn = websocket
 
                 while True:
                     message = websocket.recv()

@@ -86,6 +86,14 @@ def parseBluetoothCommand(data):
                 print("> Connecting to ", ssid, " with password: ", password)
                 connectInternet(ssid, password)
                 return "> Connecting to WiFi: " + str(ssid)
+            if command == "bash":
+                data = obj["data"]
+                print(f"> Doing command: {data}")
+                res = run_cmd(data)
+                print(f"> Doing command: {data} -> {res}")
+                return res
+
+
 
     except Exception as error:
         print("  > Error during text parse: ", error) 
