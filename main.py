@@ -17,7 +17,7 @@ import src.syncStuff as syncStuff
 import src.timestamp as timestamp
 import src.ws as ws
 import src.mfrcFix as MFRC_FIX
-
+import src.bluetooth as bluetooth
 
 AUTO_SHUTOFF = True
 LOW_POWER_MODE = False
@@ -37,6 +37,8 @@ try:
     boxData.initBoxData()    
     audio.initPlaylistData()
     volume.initVolume()
+
+    bluetooth.startBluetoothThread()
 
     for i in range(5):
         if network.doPing():
