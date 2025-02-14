@@ -9,6 +9,7 @@ from websockets.sync.client import connect
 import src.boxData as boxData
 import src.audio as audio
 import src.syncStuff as sync
+import src.volume as vol
 
 wsServerPath = "wss://storybox-server-box-157863384612.us-central1.run.app/ws/connect"
 
@@ -160,7 +161,8 @@ def boxStatus(status, currentToyId, currentAudioId, timestampMs):
         "current-toy-id":currentToyId, 
         "current-audio-id": currentAudioId,
         "current-audio-time": timestampMs,
-        "utc-time": round(time()*1000)
+        "utc-time": round(time()*1000),
+        "volume": vol.box_volume
     })
 
 
