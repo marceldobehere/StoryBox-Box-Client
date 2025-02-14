@@ -33,11 +33,12 @@ def enableInternet():
 timestamp.printTimeLog("Pre init")
 
 try:
+    bluetooth.bluetoothInit()
+
     btn.initButtons()
     boxData.initBoxData()    
     audio.initPlaylistData()
     volume.initVolume()
-
     bluetooth.startBluetoothThread()
 
     for i in range(5):
@@ -60,10 +61,13 @@ try:
     if not network.validateSession(boxData.serialCode):
         print("> ERROR: BOX IS NOT VALID!!!")
         audio.tryPlayFile("./OLD/bruh.wav", None) # WARNING SOUND IF BOX IS NOT VALID / THERE IS NO INTERNET
+        bluetooth.bluetoothSearchForDevice()
         # ws.deleteBoxData()
         # exit(-1)
     else:
         print("> Box is valid!")
+
+    # bluetooth.bluetoothSearchForDevice()
 
     ws.initWs()
 except Exception as error:

@@ -31,14 +31,92 @@ def run_cmd(command: str):
 
     return stdout.decode("utf-8")
 
-def bluetoothStuff():
+# marcel@story-box:~/StoryBox-Box-Client $ timeout 20s bluetoothctl
+# Agent registered
+# [CHG] Controller D8:3A:DD:93:DC:F3 Pairable: yes
+# [CHG] Device 54:92:09:40:B4:19 Connected: yes
+# Request confirmation
+# [agent] Confirm passkey 523775 (yes/no): yes
+# [HUAWEI P30]# 
+# marcel@story-box:~/StoryBox-Box-Client $ bluetoothctl pair 54:92:09:40:B4:19
+# Attempting to pair with 54:92:09:40:B4:19
+# bluetoothctl trust 54:92:09:40:B4:19
+# Failed to pair: org.bluez.Error.AlreadyExists
+# marcel@story-box:~/StoryBox-Box-Client $ bluetoothctl connect 54:92:09:40:B4:19
+
+
+
+def letNewDeviceConnect():
+    print("> Letting Devices Connect")
+
+    process = subprocess.Popen(["stdbuf", "-oL", "-eL", "bluetoothctl", "scan", "on"], stdout=subprocess.PIPE, stdin=subprocess.PIPE)
+
+    def stop():
+        print("> Doing STOP!")
+        process.terminate()
+    
+
+    thread = threading.Timer(300.0, stop)
+    thread.start()
+
+    print("> Output:")
+    dev = ""
+    while True:
+        line = process.stdout.readline().rstrip()
+        if process.poll() is not None:
+            break
+        if not line:
+            continue   
+        line = line.decode('utf-8')
+        # print(" > ", line)
+        if line.endswith("Connected: yes"):
+            print ("  > CONNECTED!")
+            dev = line
+            break
+    print("> Output done")
+    process.kill()
+
+    colonSplit = line.split(':')
+    lastPart = colonSplit[-2] #19
+    firstPart = colonSplit[0] #... [CHG] Device 54
+    lastSpacePart = firstPart.split(' ')[-1] #54
+    # combine all part inbetween
+    # 54:92:09:40:B4:19
+    macAddress = lastSpacePart + ':' + ':'.join(colonSplit[1:-2]) + ':' + lastPart.split(' ')[0]
+    print("> Device: " + macAddress)
+    # pair
+    sleep(1.0)
+    print("> Remove: ", run_cmd(f"bluetoothctl remove {macAddress}") )
+
+    print("> Doing Scan")
+    process = subprocess.Popen(["timeout", "5", "bluetoothctl", "scan", "on"], stdout=subprocess.PIPE, stdin=subprocess.PIPE)
+    res = process.communicate()
+    print(res)
+
+    sleep(1.0)
+    print("> Trust: ", run_cmd(f"bluetoothctl trust {macAddress}") )
+    sleep(1.0)
+    print("> Pairing: ", run_cmd(f"bluetoothctl pair {macAddress}") )
+    sleep(1.0)
+    print("> Connecting: ", run_cmd(f"bluetoothctl connect {macAddress}") )
+    sleep(1.0)
+    
+def bluetoothInit():
     print("> Starting Bluetooth Stuff")
+    print(run_cmd("bluetoothctl power on") )
     print(run_cmd("bluetoothctl agent on") )
     print(run_cmd("bluetoothctl default-agent") )
-    print(run_cmd("timeout 10s bluetoothctl scan on") )
+    print(run_cmd("bluetoothctl discoverable on") )
+    print(run_cmd("bluetoothctl pairable on") )
+    # print(run_cmd("timeout 10s bluetoothctl scan on") )
     print(run_cmd(f"bluetoothctl pair {deviceStr}") )
-    print(run_cmd(f"bluetoothctl connect {deviceStr}") )
+    # print(run_cmd(f"bluetoothctl connect {deviceStr}") )
 
+def bluetoothSearchForDevice():
+    thread = threading.Timer(1.0, letNewDeviceConnect)
+    thread.start()
+
+def bluetoothStuff():
     print("Entering Main Scan Loop")
     exit = False
     while not exit:
