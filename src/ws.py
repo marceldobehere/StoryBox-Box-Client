@@ -136,7 +136,7 @@ def authBoxReply(obj):
     print(f" > Box Auth Reply: {obj}")
     if obj["error"]:
         print("> ERR: WEBSOCKET CONNECTION FAILED TO AUTHENTICATE")
-        os._exit(-1)
+        # os._exit(-1)
 
 def authBox(serialId):
     attachListener("auth_box", authBoxReply)
