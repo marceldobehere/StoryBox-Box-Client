@@ -24,6 +24,8 @@ def convPlaylist(playlistObj):
         if autoplay:
             resObj["mode"] = "sequential"
 
+        resObj["loop"] = temp["loop"]
+
         resObj["audioFiles"] = temp["audio"]
         resObj["hashes"] = temp["hashes"]
         res.append(resObj)

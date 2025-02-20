@@ -398,14 +398,14 @@ def tryPlayPlaylist2(audioFileId, playlist, playlistId):
             print("> STOP")
             return
 
-        if playlist["autoplay"]:
-            print("> NEXT SONG AUTOPLAY")
-            if audioFileId == playlist["audioFiles"][-1]:
-                print("> NEXT SONG AUTOPLAY DONE")
-                return
-            audioFileId = pickNextSong(playlist, playlistId, True)
-            tryPlayPlaylist2(audioFileId, playlist, playlistId)
+    if playlist["autoplay"]:
+        print("> NEXT SONG AUTOPLAY")
+        if audioFileId == playlist["audioFiles"][-1] and not playlist["loop"]:
+            print("> NEXT SONG AUTOPLAY DONE")
             return
+        audioFileId = pickNextSong(playlist, playlistId, True)
+        tryPlayPlaylist2(audioFileId, playlist, playlistId)
+        return
 
     if doIdle:
         ws.boxStatus("IDLE", None, None, None)
