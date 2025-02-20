@@ -237,6 +237,10 @@ def tryPlayFile(path, updateFunc):
                         A_CMD = "STOP"
                         break
 
+            if volume.volumeBtnCheck():
+                sendUpdate = True
+            player.audio_set_volume(volume.box_volume)
+
             if updateFunc is not None:
                 localLastTime = player.get_time() // updateFreq
                 localPaused = not player.is_playing()
@@ -252,8 +256,6 @@ def tryPlayFile(path, updateFunc):
                 if sendUpdate:
                     updateFunc(player.get_time(), localPaused)
 
-            volume.volumeBtnCheck()
-            player.audio_set_volume(volume.box_volume)
             sleep(0.1)
     except Exception as error:
         print('> ERROR DURING PLAYBACK: ', error)

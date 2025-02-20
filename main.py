@@ -170,6 +170,7 @@ def mainLoop():
             
             if volume.volumeBtnCheck():
                 actionDone = True
+                ws.boxStatus("IDLE", None, None, None)
                 continue
             
             if LOW_POWER_MODE:
