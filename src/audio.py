@@ -366,6 +366,12 @@ def tryPlayPlaylist(playlistId):
     tryPlayPlaylist2(audioFileId, playlist, playlistId)
 
 def tryPlayPlaylist2(audioFileId, playlist, playlistId):
+    playlist = findPlaylist(str(playlistId))
+    if playlist is None:
+        print(" > Playlist not found!")
+        sleep(0.5)
+        return
+
     audioFile = getFileNameFromId(audioFileId, None)
     print(" > Picked: ", audioFile)
 
@@ -402,6 +408,8 @@ def tryPlayPlaylist2(audioFileId, playlist, playlistId):
         print("> NEXT SONG AUTOPLAY")
         if audioFileId == playlist["audioFiles"][-1] and not playlist["loop"]:
             print("> NEXT SONG AUTOPLAY DONE")
+            if doIdle:
+                ws.boxStatus("IDLE", None, None, None)
             return
         audioFileId = pickNextSong(playlist, playlistId, True)
         tryPlayPlaylist2(audioFileId, playlist, playlistId)
