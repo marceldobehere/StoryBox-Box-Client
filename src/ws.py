@@ -192,6 +192,11 @@ def handleAudioCommand(command, arg):
             audio.cmdSetTime(arg["TIME"])
         else:
             raise Exception("NO SET TIME PROVIDED")
+    elif command == "SET_VOLUME":
+        if arg is not None and "VOLUME" in arg:
+            vol.saveVolume(arg["VOLUME"])
+        else:
+            raise Exception("NO VOLUME PROVIDED")
     elif command == "NEXT_SONG":
         audio.cmdNextSong()
     elif command == "PREVIOUS_SONG":
