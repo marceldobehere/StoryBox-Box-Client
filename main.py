@@ -61,11 +61,17 @@ try:
     if not network.validateSession(boxData.serialCode):
         print("> ERROR: BOX IS NOT VALID!!!")
         audio.tryPlayFile("./OLD/bruh.wav", None) # WARNING SOUND IF BOX IS NOT VALID / THERE IS NO INTERNET
-        bluetooth.bluetoothSearchForDevice()
         # ws.deleteBoxData()
         # exit(-1)
     else:
         print("> Box is valid!")
+        res = network.getBoxInfo()
+        if res is not None:
+            print(f"> BOX INFO: {res}")
+            volume.saveVolume(res['volume'])
+    
+    if not network.doPing():
+        bluetooth.bluetoothSearchForDevice()
 
     # bluetooth.bluetoothSearchForDevice()
 

@@ -69,6 +69,20 @@ def doPing():
         print("  > Error during Ping: ", error) 
         return False
 
+def getBoxInfo():
+    try:
+        url = box_server_url + '/box-info/' + boxData.serialCode
+        response = requests.get(url, timeout=4)
+        if response.status_code != 200:
+            return None
+    
+        return json.loads(response.content) 
+    except Exception as error:
+        print("  > Error during Get Playlist: ", error) 
+        return None
+
+
+
 def connectAccount(accountKey, serialKey):
     try:
         url = box_server_url + '/account/connect'
