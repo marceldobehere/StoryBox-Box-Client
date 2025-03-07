@@ -237,6 +237,8 @@ def tryPlayFile(path, updateFunc):
                         A_CMD = "STOP"
                         break
 
+            sendUpdate = False
+
             if volume.volumeBtnCheck():
                 sendUpdate = True
             player.audio_set_volume(volume.box_volume)
@@ -244,7 +246,6 @@ def tryPlayFile(path, updateFunc):
             if updateFunc is not None:
                 localLastTime = player.get_time() // updateFreq
                 localPaused = not player.is_playing()
-                sendUpdate = False
 
                 if localLastTime > lastTime:
                     lastTime = localLastTime

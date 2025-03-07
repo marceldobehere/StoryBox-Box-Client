@@ -18,6 +18,7 @@ import src.timestamp as timestamp
 import src.ws as ws
 import src.mfrcFix as MFRC_FIX
 import src.bluetooth as bluetooth
+import src.lock as lock
 
 AUTO_SHUTOFF = True
 LOW_POWER_MODE = False
@@ -40,6 +41,7 @@ try:
     audio.initPlaylistData()
     volume.initVolume()
     bluetooth.startBluetoothThread()
+    lock.initLock()
 
     for i in range(5):
         if network.doPing():
@@ -68,7 +70,10 @@ try:
         res = network.getBoxInfo()
         if res is not None:
             print(f"> BOX INFO: {res}")
+            if res['volume'] == -1:
+                res['volume'] = 50
             volume.saveVolume(res['volume'])
+            lock.saveLock(res['locked'])
     
     if not network.doPing():
         bluetooth.bluetoothSearchForDevice()
@@ -152,16 +157,19 @@ def mainLoop():
 
 
             # print('> Waiting for Chip:')
-            id = reader.read_id_no_block()
-            if id:
-                id, text = MFRC_FIX.read_blocks(reader, 4)
-                tryParseRfidData(text)
-                # MFRC_FIX.write_blocks(reader, '{"command":"wifi-connect", "ssid":"wifi", "password":"pass"}', 4)
-                # MFRC_FIX.write_blocks(reader, '', 4)
-                actionDone = True
-                audio.tryPlayPlaylist(id)
-                sleep(0.5)
-                continue
+
+
+            if not lock.box_locked:
+                id = reader.read_id_no_block()
+                if id:
+                    id, text = MFRC_FIX.read_blocks(reader, 4)
+                    tryParseRfidData(text)
+                    # MFRC_FIX.write_blocks(reader, '{"command":"wifi-connect", "ssid":"wifi", "password":"pass"}', 4)
+                    # MFRC_FIX.write_blocks(reader, '', 4)
+                    actionDone = True
+                    audio.tryPlayPlaylist(id)
+                    sleep(0.5)
+                    continue
             
             if btn.getBtn(0):
                 actionDone = True
