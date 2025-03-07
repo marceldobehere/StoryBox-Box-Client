@@ -3,6 +3,8 @@ import src.network as network
 import src.audio as audio
 import src.network as network
 import src.files as files
+import src.volume as volume
+import src.lock as lock
 from time import sleep
 import json
 
@@ -91,6 +93,11 @@ def compareIdsAndHashes(downloaded, remote):
 def performSync():
     try:
         print("> Performing Sync")
+
+        res = network.getBoxInfo()
+        if res is not None:
+            print(f"> BOX INFO: {res}")
+            lock.saveLock(res['locked'])
 
         updatePlaylist()
 
