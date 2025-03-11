@@ -7,6 +7,7 @@ import src.btn as btn
 import random
 import src.volume as volume
 import src.ws as ws
+import src.lock as lock
 
 secure_random = random.SystemRandom()
 
@@ -151,6 +152,10 @@ def tryPlayFile(path, updateFunc):
     try:
         while True:
             if player.get_state() == Ended:
+                break
+            if lock.box_locked:
+                while hasCmd():
+                    getCmd()
                 break
 
             if btn.getBtn(0):
