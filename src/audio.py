@@ -135,7 +135,10 @@ def tryPlayFile(path, updateFunc):
     print(" > Playing: " + path)
 
     player = vlc.MediaPlayer(path)
+    sleep(0.1)
     player.audio_set_volume(volume.box_volume)
+
+    sleep(0.5)
     
     print('  > Play')
     player.play()
@@ -158,7 +161,7 @@ def tryPlayFile(path, updateFunc):
                     getCmd()
                 break
 
-            if btn.getBtn(0):
+            if btn.getBtn(0) and updateFunc is not None:
                 was_playing = player.is_playing()
             
                 if not was_playing:
@@ -232,7 +235,7 @@ def tryPlayFile(path, updateFunc):
                 A_CMD = None
                 A_ARG = None
 
-            if READER_REF is not None:
+            if READER_REF is not None and updateFunc is not None:
                 TAG_HERE_NOW = checkTag()
                 if TAG_HERE_NOW:
                     if time() < TAG_RESET:
@@ -244,7 +247,7 @@ def tryPlayFile(path, updateFunc):
 
             sendUpdate = False
 
-            if volume.volumeBtnCheck():
+            if updateFunc is not None and volume.volumeBtnCheck():
                 sendUpdate = True
             player.audio_set_volume(volume.box_volume)
 
@@ -375,6 +378,11 @@ def tryPlayPlaylist2(audioFileId, playlist, playlistId):
     playlist = findPlaylist(str(playlistId))
     if playlist is None:
         print(" > Playlist not found!")
+        sleep(0.5)
+        return
+
+    if lock.box_locked:
+        print(" > Box locked")
         sleep(0.5)
         return
 

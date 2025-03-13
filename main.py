@@ -171,7 +171,7 @@ def mainLoop():
                     sleep(0.5)
                     continue
                 else:
-                    audio.tryPlayFile("./OLD/error.mp3", None) # NO INTERNET WARNING
+                    audio.tryPlayFile("./OLD/error.mp3", None)
                     sleep(0.5)
                     continue
             
@@ -180,16 +180,28 @@ def mainLoop():
                 timeA = time()
                 while btn.getBtn(0) and not time() - timeA > 5:
                     sleep(0.1)
+
+                if lock.box_locked:
+                    audio.tryPlayFile("./OLD/error.mp3", None) 
+                    sleep(0.5)
+                    continue
+
                 if time() - timeA > 5:
                     print("SHUTDOWNNNN")
                     audio.tryPlayFile("./OLD/bruh.wav", None)
                     powerOff()
                 continue
             
-            if volume.volumeBtnCheck():
-                actionDone = True
-                ws.boxStatus("IDLE", None, None, None)
-                continue
+            if lock.box_locked:
+                if btn.getBtn(1) or btn.getBtn(2):
+                    audio.tryPlayFile("./OLD/error.mp3", None) 
+                    sleep(0.5)
+                    continue
+            else:
+                if volume.volumeBtnCheck():
+                    actionDone = True
+                    ws.boxStatus("IDLE", None, None, None)
+                    continue
             
             if LOW_POWER_MODE:
                 sleep(1.1)
