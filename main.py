@@ -159,15 +159,19 @@ def mainLoop():
             # print('> Waiting for Chip:')
 
 
-            if not lock.box_locked:
-                id = reader.read_id_no_block()
-                if id:
+            id = reader.read_id_no_block()
+            if id:
+                if not lock.box_locked:
                     id, text = MFRC_FIX.read_blocks(reader, 4)
                     tryParseRfidData(text)
                     # MFRC_FIX.write_blocks(reader, '{"command":"wifi-connect", "ssid":"wifi", "password":"pass"}', 4)
                     # MFRC_FIX.write_blocks(reader, '', 4)
                     actionDone = True
                     audio.tryPlayPlaylist(id)
+                    sleep(0.5)
+                    continue
+                else:
+                    audio.tryPlayFile("./OLD/error.mp3", None) # NO INTERNET WARNING
                     sleep(0.5)
                     continue
             
