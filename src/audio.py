@@ -372,6 +372,8 @@ def tryPlayPlaylist(playlistId):
         return
     print(playlist)
     audioFileId = pickNextSong(playlist, playlistId, False)
+    while hasCmd():
+        A_CMD, A_ARG = getCmd()
     tryPlayPlaylist2(audioFileId, playlist, playlistId)
 
 def tryPlayPlaylist2(audioFileId, playlist, playlistId):

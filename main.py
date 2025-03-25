@@ -29,7 +29,9 @@ def setLowPowerMode(state):
 
 def enableInternet():
     call("sudo nmcli radio wifi on", shell=True)
+    sleep(0.5)
     call("sudo iwlist wlan0 scan", shell=True)
+    sleep(0.5)
 
 timestamp.printTimeLog("Pre init")
 

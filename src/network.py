@@ -63,7 +63,7 @@ def getPlaylists():
 
 def doPing():
     try:
-        response = requests.get("https://cdn.marceldobehere.com/file/PING_FROM_PI", timeout=4)
+        response = requests.get(box_server_url, timeout=4)
         return response.status_code == 200 or response.status_code == 404
     except Exception as error:  
         print("  > Error during Ping: ", error) 

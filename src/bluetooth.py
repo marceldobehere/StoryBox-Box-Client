@@ -50,9 +50,11 @@ def letNewDeviceConnect():
     print("> Letting Devices Connect")
 
     process = subprocess.Popen(["stdbuf", "-oL", "-eL", "bluetoothctl", "scan", "on"], stdout=subprocess.PIPE, stdin=subprocess.PIPE)
+    stopped = False
 
     def stop():
         print("> Doing STOP!")
+        stopped = True
         process.terminate()
     
 
@@ -75,6 +77,9 @@ def letNewDeviceConnect():
             break
     print("> Output done")
     process.kill()
+
+    if stopped:
+        return
 
     colonSplit = line.split(':')
     lastPart = colonSplit[-2] #19
