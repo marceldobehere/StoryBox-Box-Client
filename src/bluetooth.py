@@ -78,10 +78,10 @@ def letNewDeviceConnect():
     print("> Output done")
     process.kill()
 
-    if stopped:
+    if stopped or dev == "":
         return
 
-    colonSplit = line.split(':')
+    colonSplit = dev.split(':')
     lastPart = colonSplit[-2] #19
     firstPart = colonSplit[0] #... [CHG] Device 54
     lastSpacePart = firstPart.split(' ')[-1] #54
