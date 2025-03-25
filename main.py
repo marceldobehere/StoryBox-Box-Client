@@ -77,8 +77,8 @@ try:
     
     if not network.doPing():
         bluetooth.bluetoothSearchForDevice()
-
-    # bluetooth.bluetoothSearchForDevice()
+    else:
+        bluetooth.bluetoothSearchForDevice()
 
     ws.initWs()
 except Exception as error:
