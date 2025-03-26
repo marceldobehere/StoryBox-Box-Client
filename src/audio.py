@@ -385,6 +385,7 @@ def tryPlayPlaylist2(audioFileId, playlist, playlistId):
 
     if lock.box_locked:
         print(" > Box locked")
+        ws.boxStatus("IDLE", None, None, None)
         sleep(0.5)
         return
 
