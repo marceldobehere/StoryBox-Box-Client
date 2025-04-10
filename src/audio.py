@@ -8,6 +8,7 @@ import random
 import src.volume as volume
 import src.ws as ws
 import src.lock as lock
+import src.network as network
 
 secure_random = random.SystemRandom()
 
@@ -368,6 +369,7 @@ def tryPlayPlaylist(playlistId):
     playlist = findPlaylist(str(playlistId))
     if playlist is None:
         print(" > Playlist not found!")
+        network.registerNewToy(playlistId)
         sleep(0.5)
         return
     print(playlist)

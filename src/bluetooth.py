@@ -5,6 +5,8 @@ from time import sleep, time
 import src.files as files
 import os.path
 from subprocess import call
+import src.boxData as boxData
+import src.syncStuff as sync
 
 
 
@@ -175,6 +177,24 @@ def parseBluetoothCommand(data):
                 res = run_cmd(data)
                 print(f"> Doing command: {data} -> {res}")
                 return res
+            if command == "restart":
+                print("> Restarting...")
+                call("sudo reboot", shell=True)
+                return "> Restarting..."
+            if command == "factory-reset":
+                print("> Factory Reset...")
+                boxData.deleteAllBoxData()
+                return "> Factory Reset..."
+            if command == "force-sync":
+                print("> Force Sync...")
+                sync.singleForceSync()
+                return "> Force Sync..."
+            if command == "set-acc-code":
+                key = obj["code"]
+                print("> Setting Account code: ", key)
+                boxData.setAccountCode(key)
+                return "> Setting Account code: " + str(key) + "\r\n> Please restart."
+            
 
 
 

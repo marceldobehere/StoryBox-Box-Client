@@ -106,6 +106,22 @@ def connectAccount(accountKey, serialKey):
         print("  > Error during Validate Session: ", error) 
         return False
 
+def registerNewToy(toyId):
+    print(f"> Registering New Toy: {toyId}")
+    try:
+        url = box_server_url + '/box/' + boxData.serialCode + '/register-toy/' + str(toyId)
+        print(url)
+        response = requests.post(url, timeout=4)
+        print(f"> Network Response: {response.status_code}, {response.content}")
+        if response.status_code != 200:
+            return False
+        
+        return True
+    except Exception as error:
+        print("  > Error during Register New Toy: ", error) 
+        return False
+
+
 def validateSession(serialKey):
     try:
         url = box_server_url + '/account/validate-session/' + serialKey
