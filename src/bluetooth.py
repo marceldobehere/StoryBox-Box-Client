@@ -33,20 +33,6 @@ def run_cmd(command: str):
 
     return stdout.decode("utf-8")
 
-# marcel@story-box:~/StoryBox-Box-Client $ timeout 20s bluetoothctl
-# Agent registered
-# [CHG] Controller D8:3A:DD:93:DC:F3 Pairable: yes
-# [CHG] Device 54:92:09:40:B4:19 Connected: yes
-# Request confirmation
-# [agent] Confirm passkey 523775 (yes/no): yes
-# [HUAWEI P30]# 
-# marcel@story-box:~/StoryBox-Box-Client $ bluetoothctl pair 54:92:09:40:B4:19
-# Attempting to pair with 54:92:09:40:B4:19
-# bluetoothctl trust 54:92:09:40:B4:19
-# Failed to pair: org.bluez.Error.AlreadyExists
-# marcel@story-box:~/StoryBox-Box-Client $ bluetoothctl connect 54:92:09:40:B4:19
-
-
 
 def letNewDeviceConnect():
     print("> Letting Devices Connect")
