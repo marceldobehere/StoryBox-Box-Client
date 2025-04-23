@@ -1,5 +1,6 @@
 # StoryBox-Box-Client
-Box Client for StoryBox for the Raspberry PI
+Box Client for StoryBox for the Raspberry PI 4B.
+Written for a school project.
 
 
 ## Notes
