@@ -191,6 +191,7 @@ def tryPlayFile(path, updateFunc):
                 if time() > lastPauseTime + 3*60:
                     print("> PAUSED TOO LONG!!!")
                     lastPauseTime = time()
+                    cmdStop()
                     break
             else:
                 lastPauseTime = time()
@@ -244,6 +245,7 @@ def tryPlayFile(path, updateFunc):
                     else:
                         print("> NEW NFC TAG BWAAAA")
                         A_CMD = "STOP"
+                        cmdStop()
                         break
 
             sendUpdate = False
@@ -369,7 +371,7 @@ def tryPlayPlaylist(playlistId):
     playlist = findPlaylist(str(playlistId))
     if playlist is None:
         print(" > Playlist not found!")
-        network.registerNewToy(playlistId)
+        network.registerToy(playlistId)
         sleep(0.5)
         return
     print(playlist)
@@ -421,6 +423,7 @@ def tryPlayPlaylist2(audioFileId, playlist, playlistId):
             return
         elif A_CMD == "STOP":
             print("> STOP")
+            ws.boxStatus("IDLE", None, None, None)
             return
 
     if playlist["autoplay"]:

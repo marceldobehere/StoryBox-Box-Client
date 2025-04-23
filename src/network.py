@@ -18,6 +18,7 @@ def getTestFile(audio_id):
         if not 'content-disposition' in  response.headers:
             print("> ERR: No Content Disposition Header in: ", response.headers)
             return False
+        print(response.headers['content-disposition'])
         contentDispositions = response.headers['content-disposition'].split(';')
         # search for a string starting with filename=
         downloadFilename = None
@@ -29,9 +30,11 @@ def getTestFile(audio_id):
         if downloadFilename == None:
             print("> ERR: No Filename found in: ", contentDispositions)
             return False
-        # print(f"> FILENAME: \"{downloadFilename}\"")
+        print(f"> FILENAME: \"{downloadFilename}\"")
 
-        fileEnding = downloadFilename.split('.')[1]
+        fileEnding = "mp3"
+        if len(downloadFilename.split('.')) > 1:
+            fileEnding = downloadFilename.split('.')[1]
         # print(f"> FILE ENDING: \"{fileEnding}\"")
 
 
@@ -106,22 +109,6 @@ def connectAccount(accountKey, serialKey):
         print("  > Error during Validate Session: ", error) 
         return False
 
-def registerNewToy(toyId):
-    print(f"> Registering New Toy: {toyId}")
-    try:
-        url = box_server_url + '/box/' + boxData.serialCode + '/register-toy/' + str(toyId)
-        print(url)
-        response = requests.post(url, timeout=4)
-        print(f"> Network Response: {response.status_code}, {response.content}")
-        if response.status_code != 200:
-            return False
-        
-        return True
-    except Exception as error:
-        print("  > Error during Register New Toy: ", error) 
-        return False
-
-
 def validateSession(serialKey):
     try:
         url = box_server_url + '/account/validate-session/' + serialKey
@@ -140,3 +127,17 @@ def validateSession(serialKey):
     except Exception as error:
         print("  > Error during Validate Session: ", error) 
         return False
+
+def registerToy(toyId):
+    try:
+        url = box_server_url + '/box/' + boxData.serialCode + '/register-toy/' + str(toyId)
+        response = requests.post(url, timeout=4)
+
+        print(f"> Network Response: {response.status_code}")
+        if response.status_code != 200:
+            return None
+        
+        return response.content    
+    except Exception as error:
+        print("  > Error during Register Toy: ", error) 
+        return None
